@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
-	//"net/http"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -67,14 +67,14 @@ func handleIRCConn(conn net.Conn) {
 		hostname = "Unknown"
 	}
 
-	//c := oauth.NewConsumer(
-	//	configarray[0],
-	//	configarray[1],
-	//	oauth.ServiceProvider{
-	//		RequestTokenUrl:   "https://api.twitter.com/oauth/request_token",
-	//		AuthorizeTokenUrl: "https://api.twitter.com/oauth/authorize",
-	//		AccessTokenUrl:    "https://api.twitter.com/oauth/access_token",
-	//	})
+	c := oauth.NewConsumer(
+		configarray[0],
+		configarray[1],
+		oauth.ServiceProvider{
+			RequestTokenUrl:   "https://api.twitter.com/oauth/request_token",
+			AuthorizeTokenUrl: "https://api.twitter.com/oauth/authorize",
+			AccessTokenUrl:    "https://api.twitter.com/oauth/access_token",
+		})
 
 	logindata := oauth.AccessToken{}
 
@@ -93,15 +93,7 @@ func handleIRCConn(conn net.Conn) {
 			json.Unmarshal([]byte(TwitterToken), &logindata)
 			fmt.Printf("Twitter token: %s \n", TwitterToken)
 			ConnectionStage++
-			// var responce http.Response
-			// response, _ := c.Get(
-			// 	"https://userstream.twitter.com/1.1/user.json",
-			// 	map[string]string{},
-			// 	&logindata)
 
-			// twitterinbound := bufio.NewReader(responce.Body)
-			// conn.Write(b)
-			// response.Body.Close()
 		}
 
 		if strings.HasPrefix(line, "NICK ") && ConnectionStage == 1 {
@@ -132,9 +124,40 @@ func handleIRCConn(conn net.Conn) {
 		if strings.HasPrefix(line, "MODE ##twitterstream") && ConnectionStage == 2 {
 			conn.Write(GenerateIRCMessageBin(RplChannelModeIs, IRCUsername, "##twitterstream +ns"))
 			conn.Write(GenerateIRCMessageBin(RplChannelCreated, IRCUsername, "##twitterstream 1401629312"))
+			go StreamTwitter(conn, logindata, c)
 		}
 
 	}
+
+}
+
+func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer) {
+
+	var response *http.Response
+	response, e := c.Get(
+		"https://userstream.twitter.com/1.1/user.json",
+		map[string]string{},
+		&logindata)
+	if e != nil {
+		fmt.Printf("AAAA: %s\r\n", e)
+		return
+	}
+
+	twitterinbound := bufio.NewReader(response.Body)
+
+	for {
+		line, _, e := twitterinbound.ReadLine()
+		if e != nil {
+			return
+		}
+		var T Tweet
+		e = json.Unmarshal(line, &T)
+		if e == nil {
+			conn.Write([]byte(fmt.Sprintf(":%s!~root@twitter.com PRIVMSG ##twitterstream :%s\r\n", T.User.ScreenName, T.Text)))
+		}
+	}
+
+	response.Body.Close()
 
 }
 
