@@ -2,207 +2,207 @@ package main
 
 //shouts to http://stackoverflow.com/questions/8490084/trying-to-write-an-irc-client-but-struggling-to-find-a-good-resource-regarding-c
 const (
-	RplNone int = 0
+	RplNone string = "0"
 
 	// Initial
-	RplWelcome   int = 001 // :Welcome to the Internet Relay Network <nickname>
-	RplYourHost  int = 002 // :Your host is <server>, running version <ver>
-	RplCreated   int = 003 // :This server was created <datetime>
-	RplMyInfo    int = 004 // <server> <ver> <usermode> <chanmode>
-	RplMap       int = 005 // :map
-	RplEndOfMap  int = 007 // :End of /MAP
-	RplMotdStart int = 375 // :- server Message of the Day
-	RplMotd      int = 372 // :- <info>
-	RplMotdAlt   int = 377 // :- <info>                                                                        (some)
-	RplMotdAlt2  int = 378 // :- <info>                                                                        (some)
-	RplMotdEnd   int = 376 // :End of /MOTD command.
-	RplUModeIs   int = 221 // <mode>
+	RplWelcome   string = "001" // :Welcome to the Internet Relay Network <nickname>
+	RplYourHost  string = "002" // :Your host is <server>, running version <ver>
+	RplCreated   string = "003" // :This server was created <datetime>
+	RplMyInfo    string = "004" // <server> <ver> <usermode> <chanmode>
+	RplMap       string = "005" // :map
+	RplEndOfMap  string = "007" // :End of /MAP
+	RplMotdStart string = "375" // :- server Message of the Day
+	RplMotd      string = "372" // :- <info>
+	RplMotdAlt   string = "377" // :- <info>                                                                        (some)
+	RplMotdAlt2  string = "378" // :- <info>                                                                        (some)
+	RplMotdEnd   string = "376" // :End of /MOTD command.
+	RplUModeIs   string = "221" // <mode>
 
 	// IsOn/UserHost
-	RplUserHost int = 302 // :userhosts
-	RplIsOn     int = 303 // :nicknames
+	RplUserHost string = "302" // :userhosts
+	RplIsOn     string = "303" // :nicknames
 
 	// Away
-	RplAway    int = 301 // <nick> :away
-	RplUnAway  int = 305 // :You are no longer marked as being away
-	RplNowAway int = 306 // :You have been marked as being away
+	RplAway    string = "301" // <nick> :away
+	RplUnAway  string = "305" // :You are no longer marked as being away
+	RplNowAway string = "306" // :You have been marked as being away
 
 	// WHOIS/WHOWAS
-	RplWhoisHelper   int = 310 // <nick> :looks very helpful                                                       DALNET
-	RplWhoIsUser     int = 311 // <nick> <username> <address> * :<info>
-	RplWhoIsServer   int = 312 // <nick> <server> :<info>
-	RplWhoIsOperator int = 313 // <nick> :is an IRC Operator
-	RplWhoIsIdle     int = 317 // <nick> <seconds> <signon> :<info>
-	RplEndOfWhois    int = 318 // <request> :End of /WHOIS list.
-	RplWhoIsChannels int = 319 // <nick> :<channels>
-	RplWhoWasUser    int = 314 // <nick> <username> <address> * :<info>
-	RplEndOfWhoWas   int = 369 // <request> :End of WHOWAS
-	RplWhoReply      int = 352 // <channel> <username> <address> <server> <nick> <flags> :<hops> <info>
-	RplEndOfWho      int = 315 // <request> :End of /WHO list.
-	RplUserIPs       int = 307 // :userips                                                                         UNDERNET
-	RplUserIP        int = 340 // <nick> :<nickname>=+<user>@<IP.address>                                          UNDERNET
+	RplWhoisHelper   string = "310" // <nick> :looks very helpful                                                       DALNET
+	RplWhoIsUser     string = "311" // <nick> <username> <address> * :<info>
+	RplWhoIsServer   string = "312" // <nick> <server> :<info>
+	RplWhoIsOperator string = "313" // <nick> :is an IRC Operator
+	RplWhoIsIdle     string = "317" // <nick> <seconds> <signon> :<info>
+	RplEndOfWhois    string = "318" // <request> :End of /WHOIS list.
+	RplWhoIsChannels string = "319" // <nick> :<channels>
+	RplWhoWasUser    string = "314" // <nick> <username> <address> * :<info>
+	RplEndOfWhoWas   string = "369" // <request> :End of WHOWAS
+	RplWhoReply      string = "352" // <channel> <username> <address> <server> <nick> <flags> :<hops> <info>
+	RplEndOfWho      string = "315" // <request> :End of /WHO list.
+	RplUserIPs       string = "307" // :userips                                                                         UNDERNET
+	RplUserIP        string = "340" // <nick> :<nickname>=+<user>@<IP.address>                                          UNDERNET
 
 	// List
-	RplListStart  int = 321 // Channel :Users Name
-	RplList       int = 322 // <channel> <users> :<topic>
-	RplListEnd    int = 323 // :End of /LIST
-	RplLinks      int = 364 // <server> <hub> :<hops> <info>
-	RplEndOfLinks int = 365 // <mask> :End of /LINKS list.
+	RplListStart  string = "321" // Channel :Users Name
+	RplList       string = "322" // <channel> <users> :<topic>
+	RplListEnd    string = "323" // :End of /LIST
+	RplLinks      string = "364" // <server> <hub> :<hops> <info>
+	RplEndOfLinks string = "365" // <mask> :End of /LINKS list.
 
 	// Post-Channel Join
-	RplUniqOpIs       int = 325
-	RplChannelModeIs  int = 324 // <channel> <mode>
-	RplChannelUrl     int = 328 // <channel> :url                                                                   DALNET
-	RplChannelCreated int = 329 // <channel> <time>
-	RplNoTopic        int = 331 // <channel> :No topic is set.
-	RplTopic          int = 332 // <channel> :<topic>
-	RplTopicSetBy     int = 333 // <channel> <nickname> <time>
-	RplNamReply       int = 353 // = <channel> :<names>
-	RplEndOfNames     int = 366 // <channel> :End of /NAMES list.
+	RplUniqOpIs       string = "325"
+	RplChannelModeIs  string = "324" // <channel> <mode>
+	RplChannelUrl     string = "328" // <channel> :url                                                                   DALNET
+	RplChannelCreated string = "329" // <channel> <time>
+	RplNoTopic        string = "331" // <channel> :No topic is set.
+	RplTopic          string = "332" // <channel> :<topic>
+	RplTopicSetBy     string = "333" // <channel> <nickname> <time>
+	RplNamReply       string = "353" // = <channel> :<names>
+	RplEndOfNames     string = "366" // <channel> :End of /NAMES list.
 
 	// Invitational
-	RplInviting  int = 341 // <nick> <channel>
-	RplSummoning int = 342
+	RplInviting  string = "341" // <nick> <channel>
+	RplSummoning string = "342"
 
 	// Channel Lists
-	RplInviteList      int = 346 // <channel> <invite> <nick> <time>                                                 IRCNET
-	RplEndOfInviteList int = 357 // <channel> :End of Channel Invite List                                            IRCNET
-	RplExceptList      int = 348 // <channel> <exception> <nick> <time>                                              IRCNET
-	RplEndOfExceptList int = 349 // <channel> :End of Channel Exception List                                         IRCNET
-	RplBanList         int = 367 // <channel> <ban> <nick> <time>
-	RplEndOfBanList    int = 368 // <channel> :End of Channel Ban List
+	RplInviteList      string = "346" // <channel> <invite> <nick> <time>                                                 IRCNET
+	RplEndOfInviteList string = "357" // <channel> :End of Channel Invite List                                            IRCNET
+	RplExceptList      string = "348" // <channel> <exception> <nick> <time>                                              IRCNET
+	RplEndOfExceptList string = "349" // <channel> :End of Channel Exception List                                         IRCNET
+	RplBanList         string = "367" // <channel> <ban> <nick> <time>
+	RplEndOfBanList    string = "368" // <channel> :End of Channel Ban List
 
 	// server/misc
-	RplVersion      int = 351 // <version>.<debug> <server> :<info>
-	RplInfo         int = 371 // :<info>
-	RplEndOfInfo    int = 374 // :End of /INFO list.
-	RplYoureOper    int = 381 // :You are now an IRC Operator
-	RplRehashing    int = 382 // <file> :Rehashing
-	RplYoureService int = 383
-	RplTime         int = 391 // <server> :<time>
-	RplUsersStart   int = 392
-	RplUsers        int = 393
-	RplEndOfUsers   int = 394
-	RplNoUsers      int = 395
-	RplServList     int = 234
-	RplServListEnd  int = 235
-	RplAdminMe      int = 256 // :Administrative info about server
-	RplAdminLoc1    int = 257 // :<info>
-	RplAdminLoc2    int = 258 // :<info>
-	RplAdminEMail   int = 259 // :<info>
-	RplTryAgain     int = 263 // :Server load is temporarily too heavy. Please wait a while and try again.
+	RplVersion      string = "351" // <version>.<debug> <server> :<info>
+	RplInfo         string = "371" // :<info>
+	RplEndOfInfo    string = "374" // :End of /INFO list.
+	RplYoureOper    string = "381" // :You are now an IRC Operator
+	RplRehashing    string = "382" // <file> :Rehashing
+	RplYoureService string = "383"
+	RplTime         string = "391" // <server> :<time>
+	RplUsersStart   string = "392"
+	RplUsers        string = "393"
+	RplEndOfUsers   string = "394"
+	RplNoUsers      string = "395"
+	RplServList     string = "234"
+	RplServListEnd  string = "235"
+	RplAdminMe      string = "256" // :Administrative info about server
+	RplAdminLoc1    string = "257" // :<info>
+	RplAdminLoc2    string = "258" // :<info>
+	RplAdminEMail   string = "259" // :<info>
+	RplTryAgain     string = "263" // :Server load is temporarily too heavy. Please wait a while and try again.
 
 	// tracing
-	RplTraceLink       int = 200
-	RplTraceConnecting int = 201
-	RplTraceHandshake  int = 202
-	RplTraceUnknown    int = 203
-	RplTraceOperator   int = 204
-	RplTraceUser       int = 205
-	RplTraceServer     int = 206
-	RplTraceService    int = 207
-	RplTraceNewType    int = 208
-	RplTraceClass      int = 209
-	RplTraceReconnect  int = 210
-	RplTraceLog        int = 261
-	RplTraceEnd        int = 262
+	RplTraceLink       string = "200"
+	RplTraceConnecting string = "201"
+	RplTraceHandshake  string = "202"
+	RplTraceUnknown    string = "203"
+	RplTraceOperator   string = "204"
+	RplTraceUser       string = "205"
+	RplTraceServer     string = "206"
+	RplTraceService    string = "207"
+	RplTraceNewType    string = "208"
+	RplTraceClass      string = "209"
+	RplTraceReconnect  string = "210"
+	RplTraceLog        string = "261"
+	RplTraceEnd        string = "262"
 
 	// stats
-	RplStatsLinkInfo int = 211 // <connection> <sendq> <sentmsg> <sentbyte> <recdmsg> <recdbyte> :<open>
-	RplStatsCommands int = 212 // <command> <uses> <bytes>
-	RplStatsCLine    int = 213 // C <address> * <server> <port> <class>
-	RplStatsNLine    int = 214 // N <address> * <server> <port> <class>
-	RplStatsILine    int = 215 // I <ipmask> * <hostmask> <port> <class>
-	RplStatsKLine    int = 216 // k <address> * <username> <details>
-	RplStatsPLine    int = 217 // P <port> <??> <??>
-	RplStatsQLine    int = 222 // <mask> :<comment>
-	RplStatsELine    int = 223 // E <hostmask> * <username> <??> <??>
-	RplStatsDLine    int = 224 // D <ipmask> * <username> <??> <??>
-	RplStatsLLine    int = 241 // L <address> * <server> <??> <??>
-	RplStatsuLine    int = 242 // :Server Up <num> days, <time>
-	RplStatsoLine    int = 243 // o <mask> <password> <user> <??> <class>
-	RplStatsHLine    int = 244 // H <address> * <server> <??> <??>
-	RplStatsGLine    int = 247 // G <address> <timestamp> :<reason>
-	RplStatsULine    int = 248 // U <host> * <??> <??> <??>
-	RplStatsZLine    int = 249 // :info
-	RplStatsYLine    int = 218 // Y <class> <ping> <freq> <maxconnect> <sendq>
-	RplEndOfStats    int = 219 // <char> :End of /STATS report
-	RplStatsUptime   int = 242
+	RplStatsLinkInfo string = "211" // <connection> <sendq> <sentmsg> <sentbyte> <recdmsg> <recdbyte> :<open>
+	RplStatsCommands string = "212" // <command> <uses> <bytes>
+	RplStatsCLine    string = "213" // C <address> * <server> <port> <class>
+	RplStatsNLine    string = "214" // N <address> * <server> <port> <class>
+	RplStatsILine    string = "215" // I <ipmask> * <hostmask> <port> <class>
+	RplStatsKLine    string = "216" // k <address> * <username> <details>
+	RplStatsPLine    string = "217" // P <port> <??> <??>
+	RplStatsQLine    string = "222" // <mask> :<comment>
+	RplStatsELine    string = "223" // E <hostmask> * <username> <??> <??>
+	RplStatsDLine    string = "224" // D <ipmask> * <username> <??> <??>
+	RplStatsLLine    string = "241" // L <address> * <server> <??> <??>
+	RplStatsuLine    string = "242" // :Server Up <num> days, <time>
+	RplStatsoLine    string = "243" // o <mask> <password> <user> <??> <class>
+	RplStatsHLine    string = "244" // H <address> * <server> <??> <??>
+	RplStatsGLine    string = "247" // G <address> <timestamp> :<reason>
+	RplStatsULine    string = "248" // U <host> * <??> <??> <??>
+	RplStatsZLine    string = "249" // :info
+	RplStatsYLine    string = "218" // Y <class> <ping> <freq> <maxconnect> <sendq>
+	RplEndOfStats    string = "219" // <char> :End of /STATS report
+	RplStatsUptime   string = "242"
 
 	// GLINE
-	RplGLineList      int = 280 // <address> <timestamp> <reason>                                                   UNDERNET
-	RplEndOfGLineList int = 281 // :End of G-line List                                                              UNDERNET
+	RplGLineList      string = "280" // <address> <timestamp> <reason>                                                   UNDERNET
+	RplEndOfGLineList string = "281" // :End of G-line List                                                              UNDERNET
 
 	// Silence
-	RplSilenceList      int = 271 // <nick> <mask>                                                                    UNDERNET/DALNET
-	RplEndOfSilenceList int = 272 // <nick> :End of Silence List                                                      UNDERNET/DALNET
+	RplSilenceList      string = "271" // <nick> <mask>                                                                    UNDERNET/DALNET
+	RplEndOfSilenceList string = "272" // <nick> :End of Silence List                                                      UNDERNET/DALNET
 
 	// LUser
-	RplLUserClient     int = 251 // :There are <user> users and <invis> invisible on <serv> servers
-	RplLUserOp         int = 252 // <num> :operator(s) online
-	RplLUserUnknown    int = 253 // <num> :unknown connection(s)
-	RplLUserChannels   int = 254 // <num> :channels formed
-	RplLUserMe         int = 255 // :I have <user> clients and <serv> servers
-	RplLUserLocalUser  int = 265 // :Current local users: <curr> Max: <max>
-	RplLUserGlobalUser int = 266 // :Current global users: <curr> Max: <max>
+	RplLUserClient     string = "251" // :There are <user> users and <invis> invisible on <serv> servers
+	RplLUserOp         string = "252" // <num> :operator(s) online
+	RplLUserUnknown    string = "253" // <num> :unknown connection(s)
+	RplLUserChannels   string = "254" // <num> :channels formed
+	RplLUserMe         string = "255" // :I have <user> clients and <serv> servers
+	RplLUserLocalUser  string = "265" // :Current local users: <curr> Max: <max>
+	RplLUserGlobalUser string = "266" // :Current global users: <curr> Max: <max>
 
 	// Errors
-	ErrNoSuchNick        int = 401 // <nickname> :No such nick
-	ErrNoSuchServer      int = 402 // <server> :No such server
-	ErrNoSuchChannel     int = 403 // <channel> :No such channel
-	ErrCannotSendToChan  int = 404 // <channel> :Cannot send to channel
-	ErrTooManyChannels   int = 405 // <channel> :You have joined too many channels
-	ErrWasNoSuchNick     int = 406 // <nickname> :There was no such nickname
-	ErrTooManyTargets    int = 407 // <target> :Duplicate recipients. No message delivered
-	ErrNoColors          int = 408 // <nickname> #<channel> :You cannot use colors on this channel. Not sent: <text>   DALNET
-	ErrNoOrigin          int = 409 // :No origin specified
-	ErrNoRecipient       int = 411 // :No recipient given (<command>)
-	ErrNoTextToSend      int = 412 // :No text to send
-	ErrNoTopLevel        int = 413 // <mask> :No toplevel domain specified
-	ErrWildTopLevel      int = 414 // <mask> :Wildcard in toplevel Domain
-	ErrBadMask           int = 415
-	ErrTooMuchInfo       int = 416 // <command> :Too many lines in the output, restrict your query                     UNDERNET
-	ErrUnknownCommand    int = 421 // <command> :Unknown command
-	ErrNoMotd            int = 422 // :MOTD File is missing
-	ErrNoAdminInfo       int = 423 // <server> :No administrative info available
-	ErrFileError         int = 424
-	ErrNoNicknameGiven   int = 431 // :No nickname given
-	ErrErroneusNickname  int = 432 // <nickname> :Erroneus Nickname
-	ErrNickNameInUse     int = 433 // <nickname> :Nickname is already in use.
-	ErrNickCollision     int = 436 // <nickname> :Nickname collision KILL
-	ErrUnAvailResource   int = 437 // <channel> :Cannot change nickname while banned on channel
-	ErrNickTooFast       int = 438 // <nick> :Nick change too fast. Please wait <sec> seconds.                         (most)
-	ErrTargetTooFast     int = 439 // <target> :Target change too fast. Please wait <sec> seconds.                     DALNET/UNDERNET
-	ErrUserNotInChannel  int = 441 // <nickname> <channel> :They aren't on that channel
-	ErrNotOnChannel      int = 442 // <channel> :You're not on that channel
-	ErrUserOnChannel     int = 443 // <nickname> <channel> :is already on channel
-	ErrNoLogin           int = 444
-	ErrSummonDisabled    int = 445 // :SUMMON has been disabled
-	ErrUsersDisabled     int = 446 // :USERS has been disabled
-	ErrNotRegistered     int = 451 // <command> :Register first.
-	ErrNeedMoreParams    int = 461 // <command> :Not enough parameters
-	ErrAlreadyRegistered int = 462 // :You may not reregister
-	ErrNoPermForHost     int = 463
-	ErrPasswdMistmatch   int = 464
-	ErrYoureBannedCreep  int = 465
-	ErrYouWillBeBanned   int = 466
-	ErrKeySet            int = 467 // <channel> :Channel key already set
-	ErrServerCanChange   int = 468 // <channel> :Only servers can change that mode                                     DALNET
-	ErrChannelIsFull     int = 471 // <channel> :Cannot join channel (+l)
-	ErrUnknownMode       int = 472 // <char> :is unknown mode char to me
-	ErrInviteOnlyChan    int = 473 // <channel> :Cannot join channel (+i)
-	ErrBannedFromChan    int = 474 // <channel> :Cannot join channel (+b)
-	ErrBadChannelKey     int = 475 // <channel> :Cannot join channel (+k)
-	ErrBadChanMask       int = 476
-	ErrNickNotRegistered int = 477 // <channel> :You need a registered nick to join that channel.                      DALNET
-	ErrBanListFull       int = 478 // <channel> <ban> :Channel ban/ignore list is full
-	ErrNoPrivileges      int = 481 // :Permission Denied- You're not an IRC operator
-	ErrChanOPrivsNeeded  int = 482 // <channel> :You're not channel operator
-	ErrCantKillServer    int = 483 // :You cant kill a server!
-	ErrRestricted        int = 484 // <nick> <channel> :Cannot kill, kick or deop channel service                      UNDERNET
-	ErrUniqOPrivsNeeded  int = 485 // <channel> :Cannot join channel (reason)
-	ErrNoOperHost        int = 491 // :No O-lines for your host
-	ErrUModeUnknownFlag  int = 501 // :Unknown MODE flag
-	ErrUsersDontMatch    int = 502 // :Cant change mode for other users
-	ErrSilenceListFull   int = 511 // <mask> :Your silence list is full                                                UNDERNET/DALNET
+	ErrNoSuchNick        string = "401" // <nickname> :No such nick
+	ErrNoSuchServer      string = "402" // <server> :No such server
+	ErrNoSuchChannel     string = "403" // <channel> :No such channel
+	ErrCannotSendToChan  string = "404" // <channel> :Cannot send to channel
+	ErrTooManyChannels   string = "405" // <channel> :You have joined too many channels
+	ErrWasNoSuchNick     string = "406" // <nickname> :There was no such nickname
+	ErrTooManyTargets    string = "407" // <target> :Duplicate recipients. No message delivered
+	ErrNoColors          string = "408" // <nickname> #<channel> :You cannot use colors on this channel. Not sent: <text>   DALNET
+	ErrNoOrigin          string = "409" // :No origin specified
+	ErrNoRecipient       string = "411" // :No recipient given (<command>)
+	ErrNoTextToSend      string = "412" // :No text to send
+	ErrNoTopLevel        string = "413" // <mask> :No toplevel domain specified
+	ErrWildTopLevel      string = "414" // <mask> :Wildcard in toplevel Domain
+	ErrBadMask           string = "415"
+	ErrTooMuchInfo       string = "416" // <command> :Too many lines in the output, restrict your query                     UNDERNET
+	ErrUnknownCommand    string = "421" // <command> :Unknown command
+	ErrNoMotd            string = "422" // :MOTD File is missing
+	ErrNoAdminInfo       string = "423" // <server> :No administrative info available
+	ErrFileError         string = "424"
+	ErrNoNicknameGiven   string = "431" // :No nickname given
+	ErrErroneusNickname  string = "432" // <nickname> :Erroneus Nickname
+	ErrNickNameInUse     string = "433" // <nickname> :Nickname is already in use.
+	ErrNickCollision     string = "436" // <nickname> :Nickname collision KILL
+	ErrUnAvailResource   string = "437" // <channel> :Cannot change nickname while banned on channel
+	ErrNickTooFast       string = "438" // <nick> :Nick change too fast. Please wait <sec> seconds.                         (most)
+	ErrTargetTooFast     string = "439" // <target> :Target change too fast. Please wait <sec> seconds.                     DALNET/UNDERNET
+	ErrUserNotInChannel  string = "441" // <nickname> <channel> :They aren't on that channel
+	ErrNotOnChannel      string = "442" // <channel> :You're not on that channel
+	ErrUserOnChannel     string = "443" // <nickname> <channel> :is already on channel
+	ErrNoLogin           string = "444"
+	ErrSummonDisabled    string = "445" // :SUMMON has been disabled
+	ErrUsersDisabled     string = "446" // :USERS has been disabled
+	ErrNotRegistered     string = "451" // <command> :Register first.
+	ErrNeedMoreParams    string = "461" // <command> :Not enough parameters
+	ErrAlreadyRegistered string = "462" // :You may not reregister
+	ErrNoPermForHost     string = "463"
+	ErrPasswdMistmatch   string = "464"
+	ErrYoureBannedCreep  string = "465"
+	ErrYouWillBeBanned   string = "466"
+	ErrKeySet            string = "467" // <channel> :Channel key already set
+	ErrServerCanChange   string = "468" // <channel> :Only servers can change that mode                                     DALNET
+	ErrChannelIsFull     string = "471" // <channel> :Cannot join channel (+l)
+	ErrUnknownMode       string = "472" // <char> :is unknown mode char to me
+	ErrInviteOnlyChan    string = "473" // <channel> :Cannot join channel (+i)
+	ErrBannedFromChan    string = "474" // <channel> :Cannot join channel (+b)
+	ErrBadChannelKey     string = "475" // <channel> :Cannot join channel (+k)
+	ErrBadChanMask       string = "476"
+	ErrNickNotRegistered string = "477" // <channel> :You need a registered nick to join that channel.                      DALNET
+	ErrBanListFull       string = "478" // <channel> <ban> :Channel ban/ignore list is full
+	ErrNoPrivileges      string = "481" // :Permission Denied- You're not an IRC operator
+	ErrChanOPrivsNeeded  string = "482" // <channel> :You're not channel operator
+	ErrCantKillServer    string = "483" // :You cant kill a server!
+	ErrRestricted        string = "484" // <nick> <channel> :Cannot kill, kick or deop channel service                      UNDERNET
+	ErrUniqOPrivsNeeded  string = "485" // <channel> :Cannot join channel (reason)
+	ErrNoOperHost        string = "491" // :No O-lines for your host
+	ErrUModeUnknownFlag  string = "501" // :Unknown MODE flag
+	ErrUsersDontMatch    string = "502" // :Cant change mode for other users
+	ErrSilenceListFull   string = "511" // <mask> :Your silence list is full                                                UNDERNET/DALNET
 )
