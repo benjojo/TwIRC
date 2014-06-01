@@ -22,6 +22,7 @@ var configarray []string
 
 func main() {
 	hostcfg := flag.String("listen", "localhost:6667", "<host>:<port>")
+	flag.Parse()
 	configbytes, err := ioutil.ReadFile("./twitterauth.cfg")
 	if err != nil {
 		log.Fatal("Could not read the config file. not going to bother")
