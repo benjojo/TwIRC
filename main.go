@@ -86,8 +86,9 @@ func handleIRCConn(conn net.Conn) {
 			return
 		}
 
+		fmt.Println(line)
+
 		if strings.HasPrefix(line, "PASS ") && ConnectionStage == 0 {
-			fmt.Println(line)
 			TwitterToken = strings.Split(line, " ")[1]
 			json.Unmarshal([]byte(TwitterToken), &logindata)
 			fmt.Printf("Twitter token: %s \n", TwitterToken)
@@ -106,13 +107,13 @@ func handleIRCConn(conn net.Conn) {
 		if strings.HasPrefix(line, "NICK ") && ConnectionStage == 1 {
 			fmt.Println(line)
 			IRCUsername = strings.Split(line, " ")[1]
-			conn.Write(GenerateIRCMessageBin(RplWelcome, IRCUsername, "Welcome to TwiRC"))
+			conn.Write(GenerateIRCMessageBin(RplWelcome, IRCUsername, ":Welcome to TwiRC"))
 
-			conn.Write(GenerateIRCMessageBin(RplYourHost, IRCUsername, fmt.Sprintf("Host is: %s", hostname)))
-			conn.Write(GenerateIRCMessageBin(RplCreated, IRCUsername, "This server was first made on 31/06/2014"))
-			conn.Write(GenerateIRCMessageBin(RplMyInfo, IRCUsername, fmt.Sprintf("%s twIRC DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI", hostname)))
-			conn.Write(GenerateIRCMessageBin(RplMotdStart, IRCUsername, "Filling in a MOTD here because I have to."))
-			conn.Write(GenerateIRCMessageBin(RplMotdEnd, IRCUsername, "done"))
+			conn.Write(GenerateIRCMessageBin(RplYourHost, IRCUsername, fmt.Sprintf(":Host is: %s", hostname)))
+			conn.Write(GenerateIRCMessageBin(RplCreated, IRCUsername, ":This server was first made on 31/06/2014"))
+			conn.Write(GenerateIRCMessageBin(RplMyInfo, IRCUsername, fmt.Sprintf(":%s twIRC DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI", hostname)))
+			conn.Write(GenerateIRCMessageBin(RplMotdStart, IRCUsername, ":Filling in a MOTD here because I have to."))
+			conn.Write(GenerateIRCMessageBin(RplMotdEnd, IRCUsername, ":done"))
 		}
 
 		if strings.HasPrefix(line, "USER ") && ConnectionStage == 1 {
@@ -121,12 +122,24 @@ func handleIRCConn(conn net.Conn) {
 			}
 		}
 
+		if strings.HasPrefix(line, "JOIN ##twitterstream") && ConnectionStage == 2 {
+			//:benjoja!~benjoja@154.58.83.29 JOIN ##twitterstream * :Ben Cox
+			conn.Write([]byte(fmt.Sprintf(":%s!~%s@idkwhatyourhostis JOIN ##twitterstream * :Ben Cox", IRCUsername, IRCUsername)))
+			conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :@%s RandomGuy", IRCUsername)))
+			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
+		}
+
+		if strings.HasPrefix(line, "MODE ##twitterstream") && ConnectionStage == 2 {
+			conn.Write(GenerateIRCMessageBin(RplChannelModeIs, IRCUsername, "##twitterstream +ns"))
+			conn.Write(GenerateIRCMessageBin(RplChannelCreated, IRCUsername, "##twitterstream 1401629312"))
+		}
+
 	}
 
 }
 
 func GenerateIRCMessage(code string, username string, data string) string {
-	return fmt.Sprintf(":twitter.com %s %s :%s\r\n", code, username, data)
+	return fmt.Sprintf(":twitter.com %s %s %s\r\n", code, username, data)
 }
 
 func GenerateIRCMessageBin(code string, username string, data string) []byte {
