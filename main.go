@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/mrjones/oauth"
 	"io/ioutil"
@@ -14,14 +15,13 @@ import (
 )
 
 const (
-	CONN_HOST = "localhost"
-	CONN_PORT = "6667"
 	CONN_TYPE = "tcp"
 )
 
 var configarray []string
 
 func main() {
+	hostcfg := flag.String("listen", "localhost:6667", "<host>:<port>")
 	configbytes, err := ioutil.ReadFile("./twitterauth.cfg")
 	if err != nil {
 		log.Fatal("Could not read the config file. not going to bother")
@@ -37,20 +37,19 @@ func main() {
 	}
 
 	// Listen for incoming connections.
-	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+	l, err := net.Listen(CONN_TYPE, *hostcfg)
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	fmt.Println("Listening on " + CONN_HOST + ":" + CONN_PORT)
+	fmt.Println("Listening on " + *hostcfg)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
 		if err != nil {
 			fmt.Println("Error accepting: ", err.Error())
-			os.Exit(1)
 		}
 		// Handle connections in a new goroutine.
 		go handleIRCConn(conn)
