@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
-	"net/http"
+	//"net/http"
 	"os"
 	"strings"
 )
@@ -62,15 +62,19 @@ func handleIRCConn(conn net.Conn) {
 	var ConnectionStage int = 0
 	var TwitterToken string
 	var IRCUsername string
+	hostname, e := os.Hostname()
+	if e != nil {
+		hostname = "Unknown"
+	}
 
-	c := oauth.NewConsumer(
-		configarray[0],
-		configarray[1],
-		oauth.ServiceProvider{
-			RequestTokenUrl:   "https://api.twitter.com/oauth/request_token",
-			AuthorizeTokenUrl: "https://api.twitter.com/oauth/authorize",
-			AccessTokenUrl:    "https://api.twitter.com/oauth/access_token",
-		})
+	//c := oauth.NewConsumer(
+	//	configarray[0],
+	//	configarray[1],
+	//	oauth.ServiceProvider{
+	//		RequestTokenUrl:   "https://api.twitter.com/oauth/request_token",
+	//		AuthorizeTokenUrl: "https://api.twitter.com/oauth/authorize",
+	//		AccessTokenUrl:    "https://api.twitter.com/oauth/access_token",
+	//	})
 
 	logindata := oauth.AccessToken{}
 
@@ -101,7 +105,20 @@ func handleIRCConn(conn net.Conn) {
 
 		if strings.HasPrefix(line, "NICK ") && ConnectionStage == 1 {
 			fmt.Println(line)
-			IRCUsername := strings.Split(line, " ")[1]
+			IRCUsername = strings.Split(line, " ")[1]
+			conn.Write(GenerateIRCMessageBin(RplWelcome, IRCUsername, "Welcome to TwiRC"))
+
+			conn.Write(GenerateIRCMessageBin(RplYourHost, IRCUsername, fmt.Sprintf("Host is: %s", hostname)))
+			conn.Write(GenerateIRCMessageBin(RplCreated, IRCUsername, "This server was first made on 31/06/2014"))
+			conn.Write(GenerateIRCMessageBin(RplMyInfo, IRCUsername, fmt.Sprintf("%s twIRC DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI", hostname)))
+			conn.Write(GenerateIRCMessageBin(RplMotdStart, IRCUsername, "Filling in a MOTD here because I have to."))
+			conn.Write(GenerateIRCMessageBin(RplMotdEnd, IRCUsername, "done"))
+		}
+
+		if strings.HasPrefix(line, "USER ") && ConnectionStage == 1 {
+			if IRCUsername != "" {
+				ConnectionStage++
+			}
 		}
 
 	}
@@ -109,9 +126,9 @@ func handleIRCConn(conn net.Conn) {
 }
 
 func GenerateIRCMessage(code string, username string, data string) string {
-	return fmt.Sprintf(":twitter.com %s %s :%s", code, username, data)
+	return fmt.Sprintf(":twitter.com %s %s :%s\r\n", code, username, data)
 }
 
-func GenerateIRCMessageBin(code string, username string, data string) string {
+func GenerateIRCMessageBin(code string, username string, data string) []byte {
 	return []byte(GenerateIRCMessage(code, username, data))
 }
