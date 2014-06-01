@@ -148,6 +148,8 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 	for {
 		line, _, e := twitterinbound.ReadLine()
 		if e != nil {
+			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : TWITTERSTREAM HAS BROKEN, HANGING UP. SORRY.\r\n")))
+			conn.Close()
 			return
 		}
 		var T Tweet
