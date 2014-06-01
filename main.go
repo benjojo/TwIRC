@@ -137,8 +137,8 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 		"https://userstream.twitter.com/1.1/user.json",
 		map[string]string{},
 		&logindata)
+
 	if e != nil {
-		fmt.Printf("AAAA: %s\r\n", e)
 		return
 	}
 
