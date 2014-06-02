@@ -124,10 +124,20 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCMessageBin(RplChannelModeIs, IRCUsername, "##twitterstream +ns"))
 			conn.Write(GenerateIRCMessageBin(RplChannelCreated, IRCUsername, "##twitterstream 1401629312"))
 			go StreamTwitter(conn, logindata, c)
+			go PingClient(conn)
 		}
 
 	}
 
+}
+
+func PingClient(conn net.Conn) {
+	for {
+		_, e := conn.Write([]byte("PING :SUP\r\n"))
+		if e != nil {
+			break
+		}
+	}
 }
 
 func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer) {
