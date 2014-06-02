@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 const (
@@ -137,6 +138,7 @@ func PingClient(conn net.Conn) {
 		if e != nil {
 			break
 		}
+		time.Sleep(time.Second * 30)
 	}
 }
 
