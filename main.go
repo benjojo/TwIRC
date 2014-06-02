@@ -29,7 +29,7 @@ func main() {
 	}
 
 	configarray = strings.Split(strings.Replace(string(configbytes), "\r", "", -1), "\n")
-	if len(configarray) != 2 {
+	if len(configarray) != 2 || (len(configarray) != 3 && configarray[2] == "") {
 		log.Fatal("bad amount of data in config.")
 	}
 
@@ -115,7 +115,6 @@ func handleIRCConn(conn net.Conn) {
 		}
 
 		if strings.HasPrefix(line, "JOIN ##twitterstream") && ConnectionStage == 2 {
-			//:benjoja!~benjoja@154.58.83.29 JOIN ##twitterstream * :Ben Cox
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@idkwhatyourhostis JOIN ##twitterstream * :Ben Cox", IRCUsername, IRCUsername)))
 			conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :@%s RandomGuy", IRCUsername)))
 			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
