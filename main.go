@@ -30,8 +30,12 @@ func main() {
 	}
 
 	configarray = strings.Split(strings.Replace(string(configbytes), "\r", "", -1), "\n")
-	if len(configarray) != 2 || (len(configarray) != 3 && configarray[2] == "") {
-		log.Fatal("bad amount of data in config.")
+	if len(configarray) != 2 || (len(configarray) != 3) {
+		if len(configarray) == 3 && configarray[2] == "" {
+
+		} else {
+			log.Fatal("bad amount of data in config.")
+		}
 	}
 
 	if configarray[0] == "API key" {
