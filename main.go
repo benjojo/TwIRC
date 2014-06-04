@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 const (
@@ -30,8 +31,12 @@ func main() {
 	}
 
 	configarray = strings.Split(strings.Replace(string(configbytes), "\r", "", -1), "\n")
-	if len(configarray) != 2 {
-		log.Fatal("bad amount of data in config.")
+	if len(configarray) != 2 && (len(configarray) != 3) {
+		if len(configarray) == 3 && configarray[2] == "" {
+
+		} else {
+			log.Fatal("bad amount of data in config.")
+		}
 	}
 
 	if configarray[0] == "API key" {
@@ -120,7 +125,6 @@ func handleIRCConn(conn net.Conn) {
 		}
 
 		if strings.HasPrefix(line, "JOIN ##twitterstream") && ConnectionStage == 2 {
-			//:benjoja!~benjoja@154.58.83.29 JOIN ##twitterstream * :Ben Cox
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@idkwhatyourhostis JOIN ##twitterstream * :Ben Cox", IRCUsername, IRCUsername)))
 			conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :@%s RandomGuy", IRCUsername)))
 			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
@@ -130,10 +134,21 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCMessageBin(RplChannelModeIs, IRCUsername, "##twitterstream +ns"))
 			conn.Write(GenerateIRCMessageBin(RplChannelCreated, IRCUsername, "##twitterstream 1401629312"))
 			go StreamTwitter(conn, logindata, c)
+			go PingClient(conn)
 		}
 
 	}
 
+}
+
+func PingClient(conn net.Conn) {
+	for {
+		_, e := conn.Write([]byte("PING :SUP\r\n"))
+		if e != nil {
+			break
+		}
+		time.Sleep(time.Second * 30)
+	}
 }
 
 func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer) {
