@@ -88,9 +88,6 @@ func handleIRCConn(conn net.Conn) {
 	for {
 		lineb, _, err := reader.ReadLine()
 		line := string(lineb)
-		if *logtwitter {
-			ioutil.WriteFile("./debug_log", line, 744)
-		}
 
 		if err != nil {
 			return
@@ -167,6 +164,11 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 
 	for {
 		line, _, e := twitterinbound.ReadLine()
+
+		if *logtwitter {
+			ioutil.WriteFile("./debug_log", line, 744)
+		}
+
 		if e != nil {
 			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : TWITTERSTREAM HAS BROKEN, HANGING UP. SORRY.\r\n")))
 			conn.Close()
