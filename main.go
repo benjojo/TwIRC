@@ -22,6 +22,7 @@ var configarray []string
 
 func main() {
 	hostcfg := flag.String("listen", "localhost:6667", "<host>:<port>")
+	logtwitter := flag.Bool("debuglog", false, "Enable if you want to log to a file")
 	flag.Parse()
 	configbytes, err := ioutil.ReadFile("./twitterauth.cfg")
 	if err != nil {
@@ -82,6 +83,10 @@ func handleIRCConn(conn net.Conn) {
 	for {
 		lineb, _, err := reader.ReadLine()
 		line := string(lineb)
+		if *logtwitter {
+			ioutil.WriteFile("./debug_log", line, 744)
+		}
+
 		if err != nil {
 			return
 		}
