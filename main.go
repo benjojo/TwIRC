@@ -134,6 +134,18 @@ func handleIRCConn(conn net.Conn) {
 			go StreamTwitter(conn, logindata, c)
 			go PingClient(conn)
 		}
+		// PRIVMSG ##twitterstream :Holla
+		if strings.HasPrefix(line, "PRIVMSG ##twitterstream :") && ConnectionStage == 2 {
+			_, err := c.Post(
+				"https://api.twitter.com/1.1/statuses/update.json",
+				map[string]string{
+					"status": strings.Replace(line, "PRIVMSG ##twitterstream :", "", 1),
+				},
+				&logindata)
+			if err != nil {
+				conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : Failed to post tweet.\r\n")))
+			}
+		}
 
 	}
 
@@ -152,6 +164,7 @@ func PingClient(conn net.Conn) {
 func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer) {
 
 	var response *http.Response
+
 	response, e := c.Get(
 		"https://userstream.twitter.com/1.1/user.json",
 		map[string]string{},
