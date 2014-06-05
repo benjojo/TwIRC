@@ -177,7 +177,10 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 		var T Tweet
 		e = json.Unmarshal(line, &T)
 		if e == nil {
-			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG ##twitterstream :%s\r\n", T.User.ScreenName, T.User.ScreenName, strings.TrimSpace(T.Text))))
+			TweetString := strings.TrimSpace(T.Text)
+			TweetString = strings.Replace(TweetString, "\r", "", -1)
+			TweetString = strings.Replace(TweetString, "\n", "", -1)
+			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG ##twitterstream :%s\r\n", T.User.ScreenName, T.User.ScreenName, TweetString)))
 		}
 	}
 
