@@ -20,10 +20,11 @@ const (
 )
 
 var configarray []string
+var logtwitter *bool
 
 func main() {
 	hostcfg := flag.String("listen", "localhost:6667", "<host>:<port>")
-	logtwitter := flag.Bool("debuglog", false, "Enable if you want to log to a file")
+	logtwitter = flag.Bool("debuglog", false, "Enable if you want to log to a file")
 	flag.Parse()
 	configbytes, err := ioutil.ReadFile("./twitterauth.cfg")
 	if err != nil {
