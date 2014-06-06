@@ -15,9 +15,6 @@ import (
 	"time"
 )
 
-const (
-	CONN_TYPE = "tcp"
-)
 
 var configarray []string
 var logtwitter *bool
