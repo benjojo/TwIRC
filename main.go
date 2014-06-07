@@ -15,9 +15,6 @@ import (
 	"time"
 )
 
-const (
-	CONN_TYPE = "tcp"
-)
 
 var configarray []string
 
@@ -43,7 +40,7 @@ func main() {
 	}
 
 	// Listen for incoming connections.
-	l, err := net.Listen(CONN_TYPE, *hostcfg)
+	l, err := net.Listen("tcp", *hostcfg)
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
