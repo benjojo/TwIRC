@@ -20,11 +20,9 @@ const (
 )
 
 var configarray []string
-var logtwitter *bool
 
 func main() {
 	hostcfg := flag.String("listen", "localhost:6667", "<host>:<port>")
-	logtwitter = flag.Bool("debuglog", false, "Enable if you want to log to a file")
 	flag.Parse()
 	configbytes, err := ioutil.ReadFile("./twitterauth.cfg")
 	if err != nil {
@@ -178,10 +176,6 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 
 	for {
 		line, _, e := twitterinbound.ReadLine()
-
-		if *logtwitter {
-			ioutil.WriteFile("./debug_log", line, 744)
-		}
 
 		if e != nil {
 			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : TWITTERSTREAM HAS BROKEN, HANGING UP. SORRY.\r\n")))
