@@ -15,7 +15,6 @@ import (
 	"time"
 )
 
-
 var configarray []string
 
 func main() {
@@ -148,7 +147,7 @@ func handleIRCConn(conn net.Conn) {
 
 func PingClient(conn net.Conn) {
 	for {
-		_, e := conn.Write([]byte("PING :SUP\r\n"))
+		_, e := conn.Write([]byte(fmt.Sprintf("PING :%d\r\n", int32(time.Now().Unix()))))
 		if e != nil {
 			break
 		}
