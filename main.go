@@ -117,7 +117,7 @@ func handleIRCConn(conn net.Conn) {
 		}
 
 		if strings.HasPrefix(line, "JOIN ##twitterstream") && ConnectionStage == 2 {
-			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox", IRCUsername, IRCUsername)))
+			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
 			conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :%s RandomGuy", IRCUsername)))
 			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
 		}
