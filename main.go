@@ -163,6 +163,7 @@ func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) string {
 	}
 
 	Flist := FollowList{}
+	json.Unmarshal(b, &Flist)
 	RunningList := ""
 	for _, v := range Flist.Users {
 		RunningList = RunningList + " " + v.ScreenName
