@@ -148,8 +148,10 @@ func handleIRCConn(conn net.Conn) {
 func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) string {
 	var response *http.Response
 	response, e := c.Get(
-		"https://api.twitter.com/1.1/friends/list.json?count=200",
-		map[string]string{},
+		"https://api.twitter.com/1.1/friends/list.json",
+		map[string]string{
+			"count": "200",
+		},
 		&logindata)
 
 	if e != nil {
