@@ -70,3 +70,50 @@ type Tweet struct {
 		Verified                       bool        `json:"verified"`
 	} `json:"user"`
 }
+
+type FollowList struct {
+	NextCursor        float64 `json:"next_cursor"`
+	NextCursorStr     string  `json:"next_cursor_str"`
+	PreviousCursor    float64 `json:"previous_cursor"`
+	PreviousCursorStr string  `json:"previous_cursor_str"`
+	Users             []struct {
+		ContributorsEnabled            bool    `json:"contributors_enabled"`
+		CreatedAt                      string  `json:"created_at"`
+		DefaultProfile                 bool    `json:"default_profile"`
+		DefaultProfileImage            bool    `json:"default_profile_image"`
+		Description                    string  `json:"description"`
+		FavouritesCount                float64 `json:"favourites_count"`
+		FollowRequestSent              bool    `json:"follow_request_sent"`
+		FollowersCount                 float64 `json:"followers_count"`
+		Following                      bool    `json:"following"`
+		FriendsCount                   float64 `json:"friends_count"`
+		GeoEnabled                     bool    `json:"geo_enabled"`
+		ID                             float64 `json:"id"`
+		IdStr                          string  `json:"id_str"`
+		IsTranslator                   bool    `json:"is_translator"`
+		Lang                           string  `json:"lang"`
+		ListedCount                    float64 `json:"listed_count"`
+		Location                       string  `json:"location"`
+		Name                           string  `json:"name"`
+		Notifications                  bool    `json:"notifications"`
+		ProfileBackgroundColor         string  `json:"profile_background_color"`
+		ProfileBackgroundImageURL      string  `json:"profile_background_image_url"`
+		ProfileBackgroundImageUrlHttps string  `json:"profile_background_image_url_https"`
+		ProfileBackgroundTile          bool    `json:"profile_background_tile"`
+		ProfileBannerURL               string  `json:"profile_banner_url"`
+		ProfileImageURL                string  `json:"profile_image_url"`
+		ProfileImageUrlHttps           string  `json:"profile_image_url_https"`
+		ProfileLinkColor               string  `json:"profile_link_color"`
+		ProfileSidebarBorderColor      string  `json:"profile_sidebar_border_color"`
+		ProfileSidebarFillColor        string  `json:"profile_sidebar_fill_color"`
+		ProfileTextColor               string  `json:"profile_text_color"`
+		ProfileUseBackgroundImage      bool    `json:"profile_use_background_image"`
+		Protected                      bool    `json:"protected"`
+		ScreenName                     string  `json:"screen_name"`
+		StatusesCount                  float64 `json:"statuses_count"`
+		TimeZone                       string  `json:"time_zone"`
+		URL                            string  `json:"url"`
+		UtcOffset                      float64 `json:"utc_offset"`
+		Verified                       bool    `json:"verified"`
+	} `json:"users"`
+}

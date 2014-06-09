@@ -118,7 +118,7 @@ func handleIRCConn(conn net.Conn) {
 
 		if strings.HasPrefix(line, "JOIN ##twitterstream") && ConnectionStage == 2 {
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
-			conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :%s RandomGuy", IRCUsername)))
+			conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :@%s %s", IRCUsername, ProduceNameList(logindata, c))))
 			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
 		}
 
@@ -143,6 +143,32 @@ func handleIRCConn(conn net.Conn) {
 
 	}
 
+}
+
+func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) string {
+	var response *http.Response
+	response, e := c.Get(
+		"https://api.twitter.com/1.1/friends/list.json?count=200",
+		map[string]string{},
+		&logindata)
+
+	if e != nil {
+		return ""
+	}
+
+	b, e := ioutil.ReadAll(response.Body)
+
+	if e != nil {
+		return ""
+	}
+
+	Flist := FollowList{}
+	RunningList := ""
+	for _, v := range Flist.Users {
+		RunningList = RunningList + " " + v.ScreenName
+	}
+
+	return RunningList
 }
 
 func PingClient(conn net.Conn) {
