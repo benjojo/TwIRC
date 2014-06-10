@@ -179,6 +179,7 @@ func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) []string {
 			RunningList = ""
 		}
 	}
+	Chunks = append(Chunks, RunningList)
 
 	return Chunks
 }
