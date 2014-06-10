@@ -181,6 +181,39 @@ func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) []string {
 	}
 	Chunks = append(Chunks, RunningList)
 
+	for Flist.NextCursorStr != "0" {
+		response, e = c.Get(
+			"https://api.twitter.com/1.1/friends/list.json",
+			map[string]string{
+				"count":  "200",
+				"cursor": Flist.NextCursorStr,
+			},
+			&logindata)
+
+		if e != nil {
+			return Chunks
+		}
+
+		b, e := ioutil.ReadAll(response.Body)
+
+		if e != nil {
+			return Chunks
+		}
+
+		json.Unmarshal(b, &Flist)
+		RunningList := ""
+		for c, v := range Flist.Users {
+			RunningList = RunningList + " " + v.ScreenName
+
+			if c%50 == 0 {
+				Chunks = append(Chunks, RunningList)
+				RunningList = ""
+			}
+		}
+		Chunks = append(Chunks, RunningList)
+
+	}
+
 	return Chunks
 }
 
