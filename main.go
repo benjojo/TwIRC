@@ -149,6 +149,7 @@ func handleIRCConn(conn net.Conn) {
 }
 
 func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) []string {
+	Chunks := make([]string, 0)
 	var response *http.Response
 	response, e := c.Get(
 		"https://api.twitter.com/1.1/friends/list.json",
@@ -158,18 +159,17 @@ func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) []string {
 		&logindata)
 
 	if e != nil {
-		return ""
+		return Chunks
 	}
 
 	b, e := ioutil.ReadAll(response.Body)
 
 	if e != nil {
-		return ""
+		return Chunks
 	}
 
 	Flist := FollowList{}
 	json.Unmarshal(b, &Flist)
-	Chunks := make([]string, 0)
 	RunningList := ""
 	for c, v := range Flist.Users {
 		RunningList = RunningList + " " + v.ScreenName
