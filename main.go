@@ -30,12 +30,12 @@ func main() {
 		if len(configarray) == 3 && configarray[2] == "" {
 
 		} else {
-			log.Fatal("bad amount of data in config.")
+			log.Fatal("Bad amount of data in config.")
 		}
 	}
 
 	if configarray[0] == "API key" {
-		log.Fatal("you need to fill out the config files...")
+		log.Fatal("You need to fill out the config files...")
 	}
 
 	// Listen for incoming connections.
