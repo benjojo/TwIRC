@@ -180,34 +180,30 @@ func GetFollowers(cursor string, logindata oauth.AccessToken, c *oauth.Consumer)
 
 func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) []string {
 	Chunks := make([]string, 0)
-	RunningList := ""
 	Flist := GetFollowers("0", logindata, c)
+	MakeUserList(Flist, Chunks)
+
+	for Flist.NextCursorStr != "0" {
+
+		Flist = GetFollowers(Flist.NextCursorStr, logindata, c)
+		MakeUserList(Flist, Chunks)
+	}
+
+	return Chunks
+}
+
+func MakeUserList(Flist FollowList, input []string) []string {
+	RunningList := ""
 	for c, v := range Flist.Users {
 		RunningList = RunningList + " " + v.ScreenName
 
 		if c%50 == 0 {
-			Chunks = append(Chunks, RunningList)
+			input = append(input, RunningList)
 			RunningList = ""
 		}
 	}
-	Chunks = append(Chunks, RunningList)
-
-	for Flist.NextCursorStr != "0" {
-		RunningList = ""
-		Flist = GetFollowers(Flist.NextCursorStr, logindata, c)
-		for c, v := range Flist.Users {
-			RunningList = RunningList + " " + v.ScreenName
-
-			if c%50 == 0 {
-				Chunks = append(Chunks, RunningList)
-				RunningList = ""
-			}
-		}
-		Chunks = append(Chunks, RunningList)
-
-	}
-
-	return Chunks
+	input = append(input, RunningList)
+	return input
 }
 
 func PingClient(conn net.Conn) {
