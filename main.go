@@ -108,6 +108,27 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCMessageBin(RplMyInfo, IRCUsername, fmt.Sprintf(":%s twIRC DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI", hostname)))
 			conn.Write(GenerateIRCMessageBin(RplMotdStart, IRCUsername, ":Filling in a MOTD here because I have to."))
 			conn.Write(GenerateIRCMessageBin(RplMotdEnd, IRCUsername, ":done"))
+		} else if strings.HasPrefix(line, "NICK ") && ConnectionStage == 0 {
+
+			requestToken, url, err := c.GetRequestTokenAndUrl("oob")
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			conn.Write([]byte("(1) Go to: " + url + "\r\n"))
+			conn.Write([]byte("(2) Grant access, you should get back a verification code.\r\n"))
+			conn.Write([]byte("(3) Enter that verification code here:"))
+
+			lineb, _, err := reader.ReadLine()
+
+			accessToken, err := c.AuthorizeToken(requestToken, string(lineb))
+			if err != nil {
+				return
+			}
+			conn.Write([]byte("Okay next time you login use the PASS:\r\n"))
+			b, _ := json.Marshal(accessToken)
+			conn.Write([]byte(string(b) + "\r\n"))
+			return
 		}
 
 		if strings.HasPrefix(line, "USER ") && ConnectionStage == 1 {
