@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -78,7 +79,7 @@ func handleIRCConn(conn net.Conn) {
 		})
 
 	logindata := oauth.AccessToken{}
-
+	var RQT *RequestToken
 	reader := bufio.NewReader(conn)
 	for {
 		lineb, _, err := reader.ReadLine()
@@ -116,8 +117,9 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCMessageBin(RplMyInfo, IRCUsername, fmt.Sprintf(":%s twIRC DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI", hostname)))
 			conn.Write(GenerateIRCMessageBin(RplMotdStart, IRCUsername, ":Filling in a MOTD here because I have to."))
 			conn.Write(GenerateIRCMessageBin(RplMotdEnd, IRCUsername, ":done"))
-
-			requestToken, url, err := c.GetRequestTokenAndUrl("oob")
+			var url string
+			var err error
+			RQT, url, err = c.GetRequestTokenAndUrl("oob")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -125,11 +127,13 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write([]byte("(1) Go to: " + url + "\r\n"))
 			conn.Write([]byte("(2) Grant access, you should get back a verification code.\r\n"))
 			conn.Write([]byte("(3) Enter that verification code here:\r\n"))
-			fmt.Println("waiting for user auth")
-			lineb, _, err := reader.ReadLine()
-			fmt.Println("got user packet that I am going to presume is auth")
-			fmt.Println(string(lineb))
-			accessToken, err := c.AuthorizeToken(requestToken, string(lineb))
+		}
+
+		// try and parse the string as a number to see what would happen
+		_, err = strconv.ParseInt(string(lineb), 10, 64)
+		if err != nil && ConnectionStage == 0 {
+
+			accessToken, err := c.AuthorizeToken(RQT, string(lineb))
 			if err != nil {
 				return
 			}
