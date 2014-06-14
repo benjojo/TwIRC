@@ -125,9 +125,10 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write([]byte("(1) Go to: " + url + "\r\n"))
 			conn.Write([]byte("(2) Grant access, you should get back a verification code.\r\n"))
 			conn.Write([]byte("(3) Enter that verification code here:\r\n"))
-
+			fmt.Println("waiting for user auth")
 			lineb, _, err := reader.ReadLine()
-
+			fmt.Println("got user packet that I am going to presume is auth")
+			fmt.Println(string(lineb))
 			accessToken, err := c.AuthorizeToken(requestToken, string(lineb))
 			if err != nil {
 				return
