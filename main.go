@@ -95,7 +95,6 @@ func handleIRCConn(conn net.Conn) {
 			json.Unmarshal([]byte(TwitterToken), &logindata)
 			fmt.Printf("Twitter token: %s \n", TwitterToken)
 			ConnectionStage++
-
 		}
 
 		if strings.HasPrefix(line, "NICK ") && ConnectionStage == 1 {
@@ -109,6 +108,14 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCMessageBin(RplMotdStart, IRCUsername, ":Filling in a MOTD here because I have to."))
 			conn.Write(GenerateIRCMessageBin(RplMotdEnd, IRCUsername, ":done"))
 		} else if strings.HasPrefix(line, "NICK ") && ConnectionStage == 0 {
+			IRCUsername = strings.Split(line, " ")[1]
+			conn.Write(GenerateIRCMessageBin(RplWelcome, IRCUsername, ":Welcome to TwiRC"))
+
+			conn.Write(GenerateIRCMessageBin(RplYourHost, IRCUsername, fmt.Sprintf(":Host is: %s", hostname)))
+			conn.Write(GenerateIRCMessageBin(RplCreated, IRCUsername, ":This server was first made on 31/06/2014"))
+			conn.Write(GenerateIRCMessageBin(RplMyInfo, IRCUsername, fmt.Sprintf(":%s twIRC DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI", hostname)))
+			conn.Write(GenerateIRCMessageBin(RplMotdStart, IRCUsername, ":Filling in a MOTD here because I have to."))
+			conn.Write(GenerateIRCMessageBin(RplMotdEnd, IRCUsername, ":done"))
 
 			requestToken, url, err := c.GetRequestTokenAndUrl("oob")
 			if err != nil {
