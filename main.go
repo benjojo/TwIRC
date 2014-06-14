@@ -79,7 +79,7 @@ func handleIRCConn(conn net.Conn) {
 		})
 
 	logindata := oauth.AccessToken{}
-	var RQT *RequestToken
+	var RQT *oauth.RequestToken
 	reader := bufio.NewReader(conn)
 	for {
 		lineb, _, err := reader.ReadLine()
