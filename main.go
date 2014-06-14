@@ -130,10 +130,11 @@ func handleIRCConn(conn net.Conn) {
 		}
 
 		// try and parse the string as a number to see what would happen
-		_, err = strconv.ParseInt(string(lineb), 10, 64)
+		linen := strings.TrimSpace(string(lineb))
+		_, err = strconv.ParseInt(linen, 10, 64)
 		if err == nil && ConnectionStage == 0 {
 
-			accessToken, err := c.AuthorizeToken(RQT, string(lineb))
+			accessToken, err := c.AuthorizeToken(RQT, linen)
 			if err != nil {
 				return
 			}
