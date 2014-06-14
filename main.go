@@ -117,7 +117,7 @@ func handleIRCConn(conn net.Conn) {
 
 			conn.Write([]byte("(1) Go to: " + url + "\r\n"))
 			conn.Write([]byte("(2) Grant access, you should get back a verification code.\r\n"))
-			conn.Write([]byte("(3) Enter that verification code here:"))
+			conn.Write([]byte("(3) Enter that verification code here:\r\n"))
 
 			lineb, _, err := reader.ReadLine()
 
