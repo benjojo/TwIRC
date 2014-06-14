@@ -91,6 +91,11 @@ func handleIRCConn(conn net.Conn) {
 
 		fmt.Println(line)
 
+		if strings.HasPrefix(line, "QUIT ") {
+			conn.Close()
+			return
+		}
+
 		if strings.HasPrefix(line, "PASS ") && ConnectionStage == 0 {
 			TwitterToken = strings.Split(line, " ")[1]
 			json.Unmarshal([]byte(TwitterToken), &logindata)
