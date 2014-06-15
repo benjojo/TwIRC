@@ -235,7 +235,7 @@ func GetFollowers(cursor string, logindata oauth.AccessToken, c *oauth.Consumer)
 func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) []string {
 	Chunks := make([]string, 0)
 	Flist := GetFollowers("0", logindata, c)
-	MakeUserList(Flist, Chunks)
+	Chunks = MakeUserList(Flist, Chunks)
 
 	for Flist.NextCursorStr != "0" {
 
