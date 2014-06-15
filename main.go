@@ -107,7 +107,6 @@ func handleIRCConn(conn net.Conn) {
 			fmt.Println(line)
 			IRCUsername = strings.Split(line, " ")[1]
 			conn.Write(GenerateIRCMessageBin(RplWelcome, IRCUsername, ":Welcome to TwiRC"))
-
 			conn.Write(GenerateIRCMessageBin(RplYourHost, IRCUsername, fmt.Sprintf(":Host is: %s", hostname)))
 			conn.Write(GenerateIRCMessageBin(RplCreated, IRCUsername, ":This server was first made on 31/06/2014"))
 			conn.Write(GenerateIRCMessageBin(RplMyInfo, IRCUsername, fmt.Sprintf(":%s twIRC DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI", hostname)))
@@ -195,15 +194,26 @@ func GetFollowers(cursor string, logindata oauth.AccessToken, c *oauth.Consumer)
 			Flist.NextCursorStr = "0"
 		}
 	}()
-	response, e := c.Get(
-		"https://api.twitter.com/1.1/friends/list.json",
-		map[string]string{
-			"count":  "200",
-			"cursor": cursor,
-		},
-		&logindata)
+	var e error
+	if cursor != "0" {
+		response, e = c.Get(
+			"https://api.twitter.com/1.1/friends/list.json",
+			map[string]string{
+				"count":  "200",
+				"cursor": cursor,
+			},
+			&logindata)
+	} else {
+		response, e = c.Get(
+			"https://api.twitter.com/1.1/friends/list.json",
+			map[string]string{
+				"count": "200",
+			},
+			&logindata)
+	}
 
 	if e != nil {
+		fmt.Println(e)
 		return Flist
 	}
 
