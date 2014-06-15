@@ -220,10 +220,15 @@ func GetFollowers(cursor string, logindata oauth.AccessToken, c *oauth.Consumer)
 	b, e := ioutil.ReadAll(response.Body)
 
 	if e != nil {
+		fmt.Println("Could not read json for followers")
 		return Flist
 	}
 
-	json.Unmarshal(b, &Flist)
+	e = json.Unmarshal(b, &Flist)
+	if e != nil {
+		fmt.Println("Could not decode json for followers")
+	}
+
 	return Flist
 }
 
@@ -235,7 +240,7 @@ func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) []string {
 	for Flist.NextCursorStr != "0" {
 
 		Flist = GetFollowers(Flist.NextCursorStr, logindata, c)
-		MakeUserList(Flist, Chunks)
+		Chunks = MakeUserList(Flist, Chunks)
 	}
 
 	return Chunks
