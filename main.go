@@ -106,10 +106,10 @@ func handleIRCConn(conn net.Conn) {
 		if strings.HasPrefix(line, "NICK ") && ConnectionStage == 1 {
 			fmt.Println(line)
 			IRCUsername = strings.Split(line, " ")[1]
-			conn.Write(GetWelcomePackets())
+			conn.Write(GetWelcomePackets(IRCUsername, hostname))
 		} else if strings.HasPrefix(line, "NICK ") && ConnectionStage == 0 {
 			IRCUsername = strings.Split(line, " ")[1]
-			conn.Write(GetWelcomePackets())
+			conn.Write(GetWelcomePackets(IRCUsername, hostname))
 
 			var url string
 			var err error
@@ -305,13 +305,13 @@ func GenerateIRCMessageBin(code string, username string, data string) []byte {
 	return []byte(GenerateIRCMessage(code, username, data))
 }
 
-func GetWelcomePackets() []byte {
-	pack := make([]byte, 0)
-	pack = append(pack, GenerateIRCMessageBin(RplWelcome, IRCUsername, ":Welcome to TwiRC"))
-	pack = append(pack, GenerateIRCMessageBin(RplYourHost, IRCUsername, fmt.Sprintf(":Host is: %s", hostname)))
-	pack = append(pack, GenerateIRCMessageBin(RplCreated, IRCUsername, ":This server was first made on 31/06/2014"))
-	pack = append(pack, GenerateIRCMessageBin(RplMyInfo, IRCUsername, fmt.Sprintf(":%s twIRC DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI", hostname)))
-	pack = append(pack, GenerateIRCMessageBin(RplMotdStart, IRCUsername, ":Filling in a MOTD here because I have to."))
-	pack = append(pack, GenerateIRCMessageBin(RplMotdEnd, IRCUsername, ":done"))
-	return pack
+func GetWelcomePackets(IRCUsername string, hostname string) []byte {
+	pack := ""
+	pack += GenerateIRCMessage(RplWelcome, IRCUsername, ":Welcome to TwiRC")
+	pack += GenerateIRCMessage(RplYourHost, IRCUsername, fmt.Sprintf(":Host is: %s", hostname))
+	pack += GenerateIRCMessage(RplCreated, IRCUsername, ":This server was first made on 31/06/2014")
+	pack += GenerateIRCMessage(RplMyInfo, IRCUsername, fmt.Sprintf(":%s twIRC DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI", hostname))
+	pack += GenerateIRCMessage(RplMotdStart, IRCUsername, ":Filling in a MOTD here because I have to.")
+	pack += GenerateIRCMessage(RplMotdEnd, IRCUsername, ":done")
+	return []byte(pack)
 }
