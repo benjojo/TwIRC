@@ -105,12 +105,17 @@ func handleIRCConn(conn net.Conn) {
 
 		if strings.HasPrefix(line, "KICK ##twitterstream ") && ConnectionStage == 2 {
 			Target := strings.Split(line, " ")[2]
-			c.Post("https://api.twitter.com/1.1/friendships/destroy.json",
+			r, e := c.Post("https://api.twitter.com/1.1/friendships/destroy.json",
 				map[string]string{
 					"screen_name": Target,
 				},
 				&logindata)
-			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PART ##twitterstream :Unfollowed\r\n", Target, Target)))
+			ioutil.ReadAll(r.Body)
+			if e == nil {
+				conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PART ##twitterstream :Unfollowed\r\n", Target, Target)))
+			} else {
+				conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream unable to unfollow\r\n")))
+			}
 
 		}
 
