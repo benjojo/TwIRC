@@ -103,6 +103,17 @@ func handleIRCConn(conn net.Conn) {
 			ConnectionStage++
 		}
 
+		if strings.HasPrefix(line, "KICK ##twitterstream ") && ConnectionStage == 2 {
+			Target := strings.Split(line, " ")[2]
+			c.Post("https://api.twitter.com/1.1/friendships/destroy.json",
+				map[string]string{
+					"screen_name": Target,
+				},
+				&logindata)
+			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PART ##twitterstream :Unfollowed\r\n", Target, Target)))
+
+		}
+
 		if strings.HasPrefix(line, "NICK ") && ConnectionStage == 1 {
 			fmt.Println(line)
 			IRCUsername = strings.Split(line, " ")[1]
