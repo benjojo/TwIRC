@@ -114,7 +114,7 @@ func handleIRCConn(conn net.Conn) {
 			if e == nil {
 				conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PART ##twitterstream :Unfollowed\r\n", Target, Target)))
 			} else {
-				conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream unable to unfollow\r\n")))
+				conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream Unable to unfollow\r\n")))
 			}
 
 		}
@@ -134,9 +134,9 @@ func handleIRCConn(conn net.Conn) {
 				log.Fatal(err)
 			}
 
-			conn.Write([]byte("(1) Go to: " + url + "\r\n"))
-			conn.Write([]byte("(2) Grant access, you should get back a verification code.\r\n"))
-			conn.Write([]byte("(3) Enter that verification code here:\r\n"))
+			conn.Write([]byte(":SYS!~SYS@twitter.com PRIVMSG (1) Go to: " + url + "\r\n"))
+			conn.Write([]byte(":SYS!~SYS@twitter.com PRIVMSG (2) Grant access, you should get back a verification code.\r\n"))
+			conn.Write([]byte(":SYS!~SYS@twitter.com PRIVMSG (3) Please enter the code as a raw command, EG '/347527'\r\n"))
 		}
 
 		// try and parse the string as a number to see what would happen
