@@ -198,20 +198,22 @@ func handleIRCConn(conn net.Conn) {
 				var err error
 				lastmention := LastMentionIDMap[strings.ToLower(bits[1])]
 				if lastmention != 0 {
-					_, err = c.Post(
-						"https://api.twitter.com/1.1/statuses/update.json",
-						map[string]string{
-							"status":                "@" + bits[1] + " " + tweetstring,
-							"in_reply_to_status_id": fmt.Sprint(lastmention),
-						},
-						&logindata)
+					// _, err = c.Post(
+					// 	"https://api.twitter.com/1.1/statuses/update.json",
+					// 	map[string]string{
+					// 		"status":                "@" + bits[1] + " " + tweetstring,
+					// 		"in_reply_to_status_id": fmt.Sprint(lastmention),
+					// 	},
+					// 	&logindata)
+					fmt.Printf("I'm going to post '%s' with a msg ID chain \n", "@"+bits[1]+" "+tweetstring)
 				} else {
-					_, err = c.Post(
-						"https://api.twitter.com/1.1/statuses/update.json",
-						map[string]string{
-							"status": tweetstring,
-						},
-						&logindata)
+					// _, err = c.Post(
+					// 	"https://api.twitter.com/1.1/statuses/update.json",
+					// 	map[string]string{
+					// 		"status": "@" + bits[1] + " " + tweetstring,
+					// 	},
+					// 	&logindata)
+					fmt.Printf("I'm going to post '%s' \n", "@"+bits[1]+" "+tweetstring)
 				}
 				if err != nil {
 					conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : Failed to post tweet.\r\n")))
