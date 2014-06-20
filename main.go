@@ -201,7 +201,7 @@ func handleIRCConn(conn net.Conn) {
 					_, err = c.Post(
 						"https://api.twitter.com/1.1/statuses/update.json",
 						map[string]string{
-							"status":                tweetstring,
+							"status":                "@" + bits[1] + " " + tweetstring,
 							"in_reply_to_status_id": fmt.Sprint(lastmention),
 						},
 						&logindata)
