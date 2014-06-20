@@ -201,16 +201,16 @@ func handleIRCConn(conn net.Conn) {
 					_, err = c.Post(
 						"https://api.twitter.com/1.1/statuses/update.json",
 						map[string]string{
-							"status":                "@" + bits[1] + " " + tweetstring[1:],
+							"status":                "@" + bits[1] + " " + tweetstring[2:],
 							"in_reply_to_status_id": fmt.Sprint(lastmention),
 						},
 						&logindata)
-					fmt.Printf("I'm going to post '%s' with a msg ID chain \n", "@"+bits[1]+" "+tweetstring)
+					fmt.Printf("I'm going to post '%s' with a msg ID chain %s %s \n", "@"+bits[1]+" "+tweetstring, lastmention, fmt.Sprint(lastmention))
 				} else {
 					_, err = c.Post(
 						"https://api.twitter.com/1.1/statuses/update.json",
 						map[string]string{
-							"status": "@" + bits[1] + " " + tweetstring[1:],
+							"status": "@" + bits[1] + " " + tweetstring[2:],
 						},
 						&logindata)
 					fmt.Printf("I'm going to post '%s' \n", "@"+bits[1]+" "+tweetstring)
