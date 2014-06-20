@@ -64,10 +64,10 @@ func handleIRCConn(conn net.Conn) {
 	var ConnectionStage int = 0
 	var TwitterToken string
 	var IRCUsername string
-	var LastTweetIDMap map[string]float64
-	var LastMentionIDMap map[string]float64
-	LastTweetIDMap = make(map[string]float64)
-	LastMentionIDMap = make(map[string]float64)
+	var LastTweetIDMap map[string]string
+	var LastMentionIDMap map[string]string
+	LastTweetIDMap = make(map[string]string)
+	LastMentionIDMap = make(map[string]string)
 
 	hostname, e := os.Hostname()
 	if e != nil {
@@ -197,7 +197,7 @@ func handleIRCConn(conn net.Conn) {
 				tweetstring := strings.Replace(line, "PRIVMSG "+bits[1], "", 1)
 				var err error
 				lastmention := LastMentionIDMap[strings.ToLower(bits[1])]
-				if lastmention != 0 {
+				if lastmention != "" {
 					_, err = c.Post(
 						"https://api.twitter.com/1.1/statuses/update.json",
 						map[string]string{
@@ -309,7 +309,7 @@ func PingClient(conn net.Conn) {
 	}
 }
 
-func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer, LastTweetIDMap map[string]float64, LastMentionIDMap map[string]float64, username string) {
+func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer, LastTweetIDMap map[string]string, LastMentionIDMap map[string]string, username string) {
 
 	var response *http.Response
 
@@ -335,13 +335,13 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 		var T Tweet
 		e = json.Unmarshal(line, &T)
 		if e == nil {
-			LastTweetIDMap[strings.ToLower(T.User.ScreenName)] = T.ID
+			LastTweetIDMap[strings.ToLower(T.User.ScreenName)] = T.IdStr
 			TweetString := strings.TrimSpace(T.Text)
 			TweetString = strings.Replace(TweetString, "\r", " ", -1)
 			TweetString = strings.Replace(TweetString, "\n", " ", -1)
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG ##twitterstream :%s\r\n", T.User.ScreenName, T.User.ScreenName, TweetString)))
 			if strings.HasPrefix(strings.ToLower(T.Text), "@"+strings.ToLower(username)) {
-				LastMentionIDMap[strings.ToLower(T.User.ScreenName)] = T.ID
+				LastMentionIDMap[strings.ToLower(T.User.ScreenName)] = T.IdStr
 				conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG %s :%s\r\n", T.User.ScreenName, T.User.ScreenName, username, TweetString)))
 			}
 		}
