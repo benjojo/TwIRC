@@ -64,6 +64,11 @@ func handleIRCConn(conn net.Conn) {
 	var ConnectionStage int = 0
 	var TwitterToken string
 	var IRCUsername string
+	var LastTweetIDMap map[string]float64
+	var LastMentionIDMap map[string]float64
+	LastTweetIDMap = make(map[string]float64)
+	LastMentionIDMap = make(map[string]float64)
+
 	hostname, e := os.Hostname()
 	if e != nil {
 		hostname = "Unknown"
@@ -172,7 +177,7 @@ func handleIRCConn(conn net.Conn) {
 		if strings.HasPrefix(line, "MODE ##twitterstream") && ConnectionStage == 2 {
 			conn.Write(GenerateIRCMessageBin(RplChannelModeIs, IRCUsername, "##twitterstream +ns"))
 			conn.Write(GenerateIRCMessageBin(RplChannelCreated, IRCUsername, "##twitterstream 1401629312"))
-			go StreamTwitter(conn, logindata, c)
+			go StreamTwitter(conn, logindata, c, LastTweetIDMap, LastMentionIDMap, IRCUsername)
 			go PingClient(conn)
 		}
 		// PRIVMSG ##twitterstream :Holla
@@ -185,6 +190,32 @@ func handleIRCConn(conn net.Conn) {
 				&logindata)
 			if err != nil {
 				conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : Failed to post tweet.\r\n")))
+			}
+		} else if strings.HasPrefix(line, "PRIVMSG ") && ConnectionStage == 2 {
+			bits := strings.Split(line, " ")
+			if len(bits) > 2 {
+				tweetstring := strings.Replace(line, "PRIVMSG "+bits[1], "", 1)
+				var err error
+				lastmention := LastMentionIDMap[strings.ToLower(bits[1])]
+				if lastmention != 0 {
+					_, err = c.Post(
+						"https://api.twitter.com/1.1/statuses/update.json",
+						map[string]string{
+							"status":                tweetstring,
+							"in_reply_to_status_id": fmt.Sprint(lastmention),
+						},
+						&logindata)
+				} else {
+					_, err = c.Post(
+						"https://api.twitter.com/1.1/statuses/update.json",
+						map[string]string{
+							"status": tweetstring,
+						},
+						&logindata)
+				}
+				if err != nil {
+					conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : Failed to post tweet.\r\n")))
+				}
 			}
 		}
 
@@ -276,7 +307,7 @@ func PingClient(conn net.Conn) {
 	}
 }
 
-func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer) {
+func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer, LastTweetIDMap map[string]float64, LastMentionIDMap map[string]float64, username string) {
 
 	var response *http.Response
 
@@ -302,10 +333,15 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 		var T Tweet
 		e = json.Unmarshal(line, &T)
 		if e == nil {
+			LastTweetIDMap[strings.ToLower(T.User.ScreenName)] = T.ID
 			TweetString := strings.TrimSpace(T.Text)
 			TweetString = strings.Replace(TweetString, "\r", " ", -1)
 			TweetString = strings.Replace(TweetString, "\n", " ", -1)
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG ##twitterstream :%s\r\n", T.User.ScreenName, T.User.ScreenName, TweetString)))
+			if strings.HasPrefix(T.Text, "@"+username) {
+				LastTweetIDMap[strings.ToLower(T.User.ScreenName)] = T.ID
+				conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com %s ##twitterstream :%s\r\n", T.User.ScreenName, T.User.ScreenName, username, TweetString)))
+			}
 		}
 	}
 
