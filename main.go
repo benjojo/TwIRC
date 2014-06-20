@@ -341,8 +341,8 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 			TweetString = strings.Replace(TweetString, "\n", " ", -1)
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG ##twitterstream :%s\r\n", T.User.ScreenName, T.User.ScreenName, TweetString)))
 			if strings.HasPrefix(strings.ToLower(T.Text), "@"+strings.ToLower(username)) {
-				LastTweetIDMap[strings.ToLower(T.User.ScreenName)] = T.ID
-				conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com %s ##twitterstream :%s\r\n", T.User.ScreenName, T.User.ScreenName, username, TweetString)))
+				LastMentionIDMap[strings.ToLower(T.User.ScreenName)] = T.ID
+				conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG %s :%s\r\n", T.User.ScreenName, T.User.ScreenName, username, TweetString)))
 			}
 		}
 	}
