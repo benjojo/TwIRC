@@ -119,7 +119,7 @@ func handleIRCConn(conn net.Conn) {
 			if e == nil {
 				conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PART ##twitterstream :Unfollowed\r\n", Target, Target)))
 			} else {
-				conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream Unable to unfollow\r\n")))
+				conn.Write(GenerateIRCPrivateMessage("Unable to unfollow user.", "##twitterstream", "SYS"))
 			}
 
 		}
@@ -139,9 +139,9 @@ func handleIRCConn(conn net.Conn) {
 				log.Fatal(err)
 			}
 
-			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG %s :(1) Go to: "+url+"\r\n", IRCUsername)))
-			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG %s :(2) Grant access, you should get back a verification code.\r\n", IRCUsername)))
-			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG %s :(3) Please enter the code as a raw command, EG '/347527'\r\n", IRCUsername)))
+			conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("(1) Go to: %s", url), IRCUsername, "SYS"))
+			conn.Write(GenerateIRCPrivateMessage("(2) Grant access, you should get back a verification code.", IRCUsername, "SYS"))
+			conn.Write(GenerateIRCPrivateMessage("(3) Please enter the code as a raw command, EG '/347527'", IRCUsername, "SYS"))
 		}
 
 		// try and parse the string as a number to see what would happen
@@ -189,7 +189,7 @@ func handleIRCConn(conn net.Conn) {
 				},
 				&logindata)
 			if err != nil {
-				conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : Failed to post tweet.\r\n")))
+				conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", "##twitterstream", "SYS"))
 			}
 		} else if strings.HasPrefix(line, "PRIVMSG ") && ConnectionStage == 2 {
 			bits := strings.Split(line, " ")
@@ -216,7 +216,7 @@ func handleIRCConn(conn net.Conn) {
 					fmt.Printf("I'm going to post '%s' \n", "@"+bits[1]+" "+tweetstring)
 				}
 				if err != nil {
-					conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : Failed to post tweet.\r\n")))
+					conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", "##twitterstream", "SYS"))
 				}
 			}
 		}
@@ -328,7 +328,7 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 		line, _, e := twitterinbound.ReadLine()
 
 		if e != nil {
-			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG ##twitterstream : TWITTERSTREAM HAS BROKEN, HANGING UP. SORRY.\r\n")))
+			conn.Write(GenerateIRCPrivateMessage("System has broken, Shutting down.", "##twitterstream", "SYS"))
 			conn.Close()
 			return
 		}
@@ -339,10 +339,10 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 			TweetString := strings.TrimSpace(T.Text)
 			TweetString = strings.Replace(TweetString, "\r", " ", -1)
 			TweetString = strings.Replace(TweetString, "\n", " ", -1)
-			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG ##twitterstream :%s\r\n", T.User.ScreenName, T.User.ScreenName, TweetString)))
+			conn.Write(GenerateIRCPrivateMessage(TweetString, "##twitterstream", T.User.ScreenName))
 			if strings.HasPrefix(strings.ToLower(T.Text), "@"+strings.ToLower(username)) {
 				LastMentionIDMap[strings.ToLower(T.User.ScreenName)] = T.IdStr
-				conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG %s :%s\r\n", T.User.ScreenName, T.User.ScreenName, username, TweetString)))
+				conn.Write(GenerateIRCPrivateMessage(TweetString, username, T.User.ScreenName))
 			}
 		}
 	}
@@ -368,4 +368,8 @@ func GetWelcomePackets(IRCUsername string, hostname string) []byte {
 	pack += GenerateIRCMessage(RplMotdStart, IRCUsername, ":Filling in a MOTD here because I have to.")
 	pack += GenerateIRCMessage(RplMotdEnd, IRCUsername, ":done")
 	return []byte(pack)
+}
+
+func GenerateIRCPrivateMessage(content string, room string, username string) []byte {
+	return []byte(fmt.Sprintf(":%s!~%s@twitter.com PRIVMSG %s :%s\r\n", username, username, room, content))
 }
