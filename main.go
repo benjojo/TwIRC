@@ -139,9 +139,9 @@ func handleIRCConn(conn net.Conn) {
 				log.Fatal(err)
 			}
 
-			conn.Write([]byte(":SYS!~SYS@twitter.com PRIVMSG (1) Go to: " + url + "\r\n"))
-			conn.Write([]byte(":SYS!~SYS@twitter.com PRIVMSG (2) Grant access, you should get back a verification code.\r\n"))
-			conn.Write([]byte(":SYS!~SYS@twitter.com PRIVMSG (3) Please enter the code as a raw command, EG '/347527'\r\n"))
+			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG %s :(1) Go to: "+url+"\r\n", IRCUsername)))
+			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG %s :(2) Grant access, you should get back a verification code.\r\n", IRCUsername)))
+			conn.Write([]byte(fmt.Sprintf(":SYS!~SYS@twitter.com PRIVMSG %s :(3) Please enter the code as a raw command, EG '/347527'\r\n", IRCUsername)))
 		}
 
 		// try and parse the string as a number to see what would happen
