@@ -334,7 +334,7 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 		}
 		var T Tweet
 		e = json.Unmarshal(line, &T)
-		if e == nil {
+		if e == nil && T.Text != "" {
 			LastTweetIDMap[strings.ToLower(T.User.ScreenName)] = T.IdStr
 			TweetString := strings.TrimSpace(T.Text)
 			TweetString = strings.Replace(TweetString, "\r", " ", -1)
@@ -344,6 +344,8 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 				LastMentionIDMap[strings.ToLower(T.User.ScreenName)] = T.IdStr
 				conn.Write(GenerateIRCPrivateMessage(TweetString, username, T.User.ScreenName))
 			}
+		} else if T.Text == "" && e == nil {
+			conn.Write(GenerateIRCPrivateMessage("unknown message: "+string(line), "##twitterstream", "SYS"))
 		}
 	}
 
