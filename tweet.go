@@ -1,5 +1,13 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/mrjones/oauth"
+	"io/ioutil"
+	"net/http"
+)
+
 type Tweet struct {
 	Contributors interface{} `json:"contributors"`
 	Coordinates  interface{} `json:"coordinates"`
@@ -79,4 +87,78 @@ type FollowList struct {
 	PreviousCursor    float64       `json:"previous_cursor"`
 	PreviousCursorStr string        `json:"previous_cursor_str"`
 	Users             []TwitterUser `json:"users"`
+}
+
+func GetFollowers(cursor string, logindata oauth.AccessToken, c *oauth.Consumer) (Flist FollowList) {
+	var response *http.Response
+
+	defer func() {
+		if Flist.NextCursorStr == "" {
+			Flist.NextCursorStr = "0"
+		}
+	}()
+	var e error
+	if cursor != "0" {
+		response, e = c.Get(
+			"https://api.twitter.com/1.1/friends/list.json",
+			map[string]string{
+				"count":  "200",
+				"cursor": cursor,
+			},
+			&logindata)
+	} else {
+		response, e = c.Get(
+			"https://api.twitter.com/1.1/friends/list.json",
+			map[string]string{
+				"count": "200",
+			},
+			&logindata)
+	}
+
+	if e != nil {
+		fmt.Println(e)
+		return Flist
+	}
+
+	b, e := ioutil.ReadAll(response.Body)
+
+	if e != nil {
+		fmt.Println("Could not read json for followers")
+		return Flist
+	}
+
+	e = json.Unmarshal(b, &Flist)
+	if e != nil {
+		fmt.Println("Could not decode json for followers")
+	}
+
+	return Flist
+}
+
+func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) []string {
+	Chunks := make([]string, 0)
+	Flist := GetFollowers("0", logindata, c)
+	Chunks = MakeUserList(Flist, Chunks)
+
+	for Flist.NextCursorStr != "0" {
+
+		Flist = GetFollowers(Flist.NextCursorStr, logindata, c)
+		Chunks = MakeUserList(Flist, Chunks)
+	}
+
+	return Chunks
+}
+
+func MakeUserList(Flist FollowList, input []string) []string {
+	RunningList := ""
+	for c, v := range Flist.Users {
+		RunningList = RunningList + " " + v.ScreenName
+
+		if c%50 == 0 {
+			input = append(input, RunningList)
+			RunningList = ""
+		}
+	}
+	input = append(input, RunningList)
+	return input
 }
