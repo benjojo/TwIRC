@@ -151,9 +151,9 @@ func handleIRCConn(conn net.Conn) {
 			if err != nil {
 				return
 			}
-			conn.Write([]byte("Okay next time you login use the PASS:\r\n"))
+			conn.Write(GenerateIRCPrivateMessage("Okay next time you login use the PASS:", IRCUsername, "SYS"))
 			b, _ := json.Marshal(accessToken)
-			conn.Write([]byte(string(b) + "\r\n"))
+			conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("%s", string(b)), IRCUsername, "SYS"))
 			return
 		}
 
