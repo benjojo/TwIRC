@@ -28,9 +28,7 @@ func main() {
 
 	configarray = strings.Split(strings.Replace(string(configbytes), "\r", "", -1), "\n")
 	if len(configarray) != 2 && (len(configarray) != 3) {
-		if len(configarray) == 3 && configarray[2] == "" {
-
-		} else {
+		if !(len(configarray) == 3 && configarray[2] == "") {
 			log.Fatal("Bad amount of data in config.")
 		}
 	}
