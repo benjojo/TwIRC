@@ -62,10 +62,10 @@ func handleIRCConn(conn net.Conn) {
 	var ConnectionStage int = 0
 	var TwitterToken string
 	var IRCUsername string
-	var LastTweetIDMap map[string]string
-	var LastMentionIDMap map[string]string
-	LastTweetIDMap = make(map[string]string)
-	LastMentionIDMap = make(map[string]string)
+	var LastTweetIDMap map[string]Tweet
+	var LastMentionIDMap map[string]Tweet
+	LastTweetIDMap = make(map[string]Tweet)
+	LastMentionIDMap = make(map[string]Tweet)
 
 	hostname, e := os.Hostname()
 	if e != nil {
@@ -195,7 +195,7 @@ func handleIRCConn(conn net.Conn) {
 				tweetstring := strings.Replace(line, "PRIVMSG "+bits[1], "", 1)
 				var err error
 				lastmention := LastMentionIDMap[strings.ToLower(bits[1])]
-				if lastmention != "" {
+				if lastmention.User.IdStr != "" {
 					_, err = c.Post(
 						"https://api.twitter.com/1.1/statuses/update.json",
 						map[string]string{
@@ -233,7 +233,7 @@ func PingClient(conn net.Conn) {
 	}
 }
 
-func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer, LastTweetIDMap map[string]string, LastMentionIDMap map[string]string, username string) {
+func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer, LastTweetIDMap map[string]Tweet, LastMentionIDMap map[string]Tweet, username string) {
 
 	var response *http.Response
 
@@ -259,13 +259,13 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 		var T Tweet
 		e = json.Unmarshal(line, &T)
 		if e == nil && T.Text != "" {
-			LastTweetIDMap[strings.ToLower(T.User.ScreenName)] = T.IdStr
+			LastTweetIDMap[strings.ToLower(T.User.ScreenName)] = T
 			TweetString := strings.TrimSpace(T.Text)
 			TweetString = strings.Replace(TweetString, "\r", " ", -1)
 			TweetString = strings.Replace(TweetString, "\n", " ", -1)
 			conn.Write(GenerateIRCPrivateMessage(TweetString, "##twitterstream", T.User.ScreenName))
 			if strings.HasPrefix(strings.ToLower(T.Text), "@"+strings.ToLower(username)) {
-				LastMentionIDMap[strings.ToLower(T.User.ScreenName)] = T.IdStr
+				LastMentionIDMap[strings.ToLower(T.User.ScreenName)] = T
 				conn.Write(GenerateIRCPrivateMessage(TweetString, username, T.User.ScreenName))
 			}
 		} else if T.Text == "" && e == nil {
