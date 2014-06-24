@@ -57,6 +57,8 @@ func main() {
 	}
 }
 
+var ReplyLatestTweet bool = false
+
 // Handles incoming requests.
 func handleIRCConn(conn net.Conn) {
 	var ConnectionStage int = 0
@@ -163,6 +165,16 @@ func handleIRCConn(conn net.Conn) {
 			}
 		}
 
+		if line == "MENTION" && ConnectionStage == 2 {
+			ReplyLatestTweet = false
+			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest mention of you", IRCUsername, "SYS"))
+		}
+
+		if line == "ALL" && ConnectionStage == 2 {
+			ReplyLatestTweet = true
+			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest tweet of the target", IRCUsername, "SYS"))
+		}
+
 		if strings.HasPrefix(line, "JOIN ##twitterstream") && ConnectionStage == 2 {
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
 			NList := ProduceNameList(logindata, c)
@@ -194,7 +206,13 @@ func handleIRCConn(conn net.Conn) {
 			if len(bits) > 2 {
 				tweetstring := strings.Replace(line, "PRIVMSG "+bits[1], "", 1)
 				var err error
-				lastmention := LastMentionIDMap[strings.ToLower(bits[1])]
+				var lastmention Tweet
+				if ReplyLatestTweet {
+					lastmention = LastTweetIDMap[strings.ToLower(bits[1])]
+				} else {
+					lastmention = LastMentionIDMap[strings.ToLower(bits[1])]
+				}
+
 				if lastmention.User.IdStr != "" {
 					_, err = c.Post(
 						"https://api.twitter.com/1.1/statuses/update.json",
