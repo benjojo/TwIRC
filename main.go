@@ -142,12 +142,13 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("(1) Go to: %s", url), IRCUsername, "SYS"))
 			conn.Write(GenerateIRCPrivateMessage("(2) Grant access, you should get back a verification code.", IRCUsername, "SYS"))
 			conn.Write(GenerateIRCPrivateMessage("(3) Please enter the code as a raw command, EG '/347527'", IRCUsername, "SYS"))
+			ConnectionStage = -1
 		}
 
 		// try and parse the string as a number to see what would happen
 		linen := strings.TrimSpace(string(lineb))
 		_, err = strconv.ParseInt(linen, 10, 64)
-		if err == nil && ConnectionStage == 0 {
+		if err == nil && ConnectionStage == -1 {
 
 			accessToken, err := c.AuthorizeToken(RQT, linen)
 			if err != nil {
@@ -156,6 +157,7 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCPrivateMessage("Okay next time you login use the PASS:", IRCUsername, "SYS"))
 			b, _ := json.Marshal(accessToken)
 			conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("%s", string(b)), IRCUsername, "SYS"))
+			conn.Write(GenerateIRCPrivateMessage("You MUST reconnect now since all commands have been disabled.", IRCUsername, "SYS"))
 			return
 		}
 
