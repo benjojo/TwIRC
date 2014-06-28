@@ -167,12 +167,12 @@ func handleIRCConn(conn net.Conn) {
 			}
 		}
 
-		if strings.ToUpper(line) == "MENTION" && ConnectionStage == 2 {
+		if strings.HasPrefix(strings.ToUpper(line), "MENTION") && ConnectionStage == 2 {
 			ReplyLatestTweet = false
 			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest mention of you", IRCUsername, "SYS"))
 		}
 
-		if strings.ToUpper(line) == "ALL" && ConnectionStage == 2 {
+		if strings.HasPrefix(strings.ToUpper(line), "ALL") && ConnectionStage == 2 {
 			ReplyLatestTweet = true
 			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest tweet of the target", IRCUsername, "SYS"))
 		}
