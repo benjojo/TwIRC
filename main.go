@@ -288,7 +288,7 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 				LastMentionIDMap[strings.ToLower(T.User.ScreenName)] = T
 				conn.Write(GenerateIRCPrivateMessage(TweetString, username, T.User.ScreenName))
 			}
-		} else if T.Text == "" && e == nil {
+		} else if T.Text == "" && e == nil && !strings.Contains([]byte(line), "friends") {
 			conn.Write(GenerateIRCPrivateMessage("unknown message: "+string(line), "##twitterstream", "SYS"))
 		}
 	}
