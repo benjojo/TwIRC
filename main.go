@@ -151,6 +151,7 @@ func handleIRCConn(conn net.Conn) {
 
 			accessToken, err := c.AuthorizeToken(RQT, linen)
 			if err != nil {
+				conn.Write(GenerateIRCPrivateMessage("Failed to auth you, Reconnect and try again (sry)", IRCUsername, "SYS"))
 				return
 			}
 			conn.Write(GenerateIRCPrivateMessage("Okay next time you login use the PASS:", IRCUsername, "SYS"))
