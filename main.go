@@ -205,43 +205,47 @@ func handleIRCConn(conn net.Conn) {
 				conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", "##twitterstream", "SYS"))
 			}
 		} else if strings.HasPrefix(line, "PRIVMSG ") && ConnectionStage == 2 {
-			bits := strings.Split(line, " ")
-			if len(bits) > 2 {
-				tweetstring := strings.Replace(line, "PRIVMSG "+bits[1], "", 1)
-				var err error
-				var lastmention Tweet
-				if ReplyLatestTweet {
-					lastmention = LastTweetIDMap[strings.ToLower(bits[1])]
-				} else {
-					lastmention = LastMentionIDMap[strings.ToLower(bits[1])]
-				}
-
-				if lastmention.User.IdStr != "" {
-					_, err = c.Post(
-						"https://api.twitter.com/1.1/statuses/update.json",
-						map[string]string{
-							"status":                fmt.Sprintf("@%s %s", bits[1], tweetstring[2:]),
-							"in_reply_to_status_id": fmt.Sprint(lastmention),
-						},
-						&logindata)
-					fmt.Printf("I'm going to post '%s' with a msg ID chain %s %s \n", "@"+bits[1]+" "+tweetstring, lastmention, fmt.Sprint(lastmention))
-				} else {
-					_, err = c.Post(
-						"https://api.twitter.com/1.1/statuses/update.json",
-						map[string]string{
-							"status": fmt.Sprintf("@%s %s", bits[1], tweetstring[2:]),
-						},
-						&logindata)
-					fmt.Printf("I'm going to post '%s' \n", "@"+bits[1]+" "+tweetstring)
-				}
-				if err != nil {
-					conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", "##twitterstream", "SYS"))
-				}
-			}
+			HandlePRIVreply(conn, logindata, c, line, LastTweetIDMap, LastMentionIDMap)
 		}
 
 	}
 
+}
+
+func HandlePRIVreply(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer, line string, LastTweetIDMap map[string]Tweet, LastMentionIDMap map[string]Tweet) {
+	bits := strings.Split(line, " ")
+	if len(bits) > 2 {
+		tweetstring := strings.Replace(line, "PRIVMSG "+bits[1], "", 1)
+		var err error
+		var lastmention Tweet
+		if ReplyLatestTweet {
+			lastmention = LastTweetIDMap[strings.ToLower(bits[1])]
+		} else {
+			lastmention = LastMentionIDMap[strings.ToLower(bits[1])]
+		}
+
+		if lastmention.User.IdStr != "" {
+			_, err = c.Post(
+				"https://api.twitter.com/1.1/statuses/update.json",
+				map[string]string{
+					"status":                fmt.Sprintf("@%s %s", bits[1], tweetstring[2:]),
+					"in_reply_to_status_id": fmt.Sprint(lastmention),
+				},
+				&logindata)
+			fmt.Printf("I'm going to post '%s' with a msg ID chain %s %s \n", "@"+bits[1]+" "+tweetstring, lastmention, fmt.Sprint(lastmention))
+		} else {
+			_, err = c.Post(
+				"https://api.twitter.com/1.1/statuses/update.json",
+				map[string]string{
+					"status": fmt.Sprintf("@%s %s", bits[1], tweetstring[2:]),
+				},
+				&logindata)
+			fmt.Printf("I'm going to post '%s' \n", "@"+bits[1]+" "+tweetstring)
+		}
+		if err != nil {
+			conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", "##twitterstream", "SYS"))
+		}
+	}
 }
 
 func PingClient(conn net.Conn) {
@@ -254,7 +258,8 @@ func PingClient(conn net.Conn) {
 	}
 }
 
-func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer, LastTweetIDMap map[string]Tweet, LastMentionIDMap map[string]Tweet, username string) {
+func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer,
+	LastTweetIDMap map[string]Tweet, LastMentionIDMap map[string]Tweet, username string) {
 
 	var response *http.Response
 

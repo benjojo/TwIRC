@@ -162,3 +162,14 @@ func MakeUserList(Flist FollowList, input []string) []string {
 	input = append(input, RunningList)
 	return input
 }
+
+type RemovePacket struct {
+	Delete struct {
+		Status struct {
+			ID        float64 `json:"id"`
+			IdStr     string  `json:"id_str"`
+			UserID    float64 `json:"user_id"`
+			UserIdStr string  `json:"user_id_str"`
+		} `json:"status"`
+	} `json:"delete"`
+}
