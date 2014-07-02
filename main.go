@@ -299,7 +299,7 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 			DP := RemovePacket{}
 			e = json.Unmarshal(line, &DP)
 			if DP.Delete.Status.IdStr != "" {
-				conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("User %s remove tweet %s", DP.Delete.Status.UserIdStr, DP.Delete.Status.IdStr), "##twitterstream", "SYS"))
+				conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("User %s (%s) remove tweet %s", DP.Delete.Status.UserIdStr, ScanForName(DP.Delete.Status.UserIdStr, LastTweetIDMap), DP.Delete.Status.IdStr), "##twitterstream", "SYS"))
 			} else {
 				conn.Write(GenerateIRCPrivateMessage("unknown message: "+string(line), "##twitterstream", "SYS"))
 			}
@@ -308,4 +308,13 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 
 	response.Body.Close()
 
+}
+
+func ScanForName(ID string, UserMap map[string]Tweet) string {
+	for k, v := range UserMap {
+		if ID == v.User.IdStr {
+			return k
+		}
+	}
+	return "???"
 }
