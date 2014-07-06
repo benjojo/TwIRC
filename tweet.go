@@ -24,11 +24,11 @@ type Tweet struct {
 	Geo                  interface{} `json:"geo"`
 	ID                   float64     `json:"id"`
 	IdStr                string      `json:"id_str"`
-	InReplyToScreenName  interface{} `json:"in_reply_to_screen_name"`
-	InReplyToStatusID    interface{} `json:"in_reply_to_status_id"`
-	InReplyToStatusIdStr interface{} `json:"in_reply_to_status_id_str"`
-	InReplyToUserID      interface{} `json:"in_reply_to_user_id"`
-	InReplyToUserIdStr   interface{} `json:"in_reply_to_user_id_str"`
+	InReplyToScreenName  string      `json:"in_reply_to_screen_name"`
+	InReplyToStatusID    float64     `json:"in_reply_to_status_id"`
+	InReplyToStatusIdStr string      `json:"in_reply_to_status_id_str"`
+	InReplyToUserID      float64     `json:"in_reply_to_user_id"`
+	InReplyToUserIdStr   string      `json:"in_reply_to_user_id_str"`
 	Lang                 string      `json:"lang"`
 	Place                interface{} `json:"place"`
 	RetweetCount         float64     `json:"retweet_count"`
