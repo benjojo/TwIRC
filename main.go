@@ -68,6 +68,7 @@ func handleIRCConn(conn net.Conn) {
 	var LastMentionIDMap map[string]Tweet
 	LastTweetIDMap = make(map[string]Tweet)
 	LastMentionIDMap = make(map[string]Tweet)
+	var HasAuthed bool = false
 
 	hostname, e := os.Hostname()
 	if e != nil {
@@ -128,6 +129,7 @@ func handleIRCConn(conn net.Conn) {
 			fmt.Println(line)
 			IRCUsername = strings.Split(line, " ")[1]
 			conn.Write(GetWelcomePackets(IRCUsername, hostname))
+			HasAuthed = true
 		} else if strings.HasPrefix(line, "NICK ") && ConnectionStage == 0 {
 			IRCUsername = strings.Split(line, " ")[1]
 			conn.Write(GetWelcomePackets(IRCUsername, hostname))
@@ -168,17 +170,17 @@ func handleIRCConn(conn net.Conn) {
 			}
 		}
 
-		if strings.HasPrefix(strings.ToUpper(line), "MENTION") && ConnectionStage == 2 {
+		if strings.HasPrefix(strings.ToUpper(line), "MENTION") && HasAuthed {
 			ReplyLatestTweet = false
 			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest mention of you", IRCUsername, "SYS"))
 		}
 
-		if strings.HasPrefix(strings.ToUpper(line), "ALL") && ConnectionStage == 2 {
+		if strings.HasPrefix(strings.ToUpper(line), "ALL") && HasAuthed {
 			ReplyLatestTweet = true
 			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest tweet of the target", IRCUsername, "SYS"))
 		}
 
-		if strings.HasPrefix(line, "JOIN ##twitterstream") && ConnectionStage == 2 {
+		if strings.HasPrefix(line, "JOIN ##twitterstream") && HasAuthed {
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
 			NList := ProduceNameList(logindata, c)
 			for _, v := range NList {
@@ -187,14 +189,14 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
 		}
 
-		if strings.HasPrefix(line, "MODE ##twitterstream") && ConnectionStage == 2 {
+		if strings.HasPrefix(line, "MODE ##twitterstream") && HasAuthed {
 			conn.Write(GenerateIRCMessageBin(RplChannelModeIs, IRCUsername, "##twitterstream +ns"))
 			conn.Write(GenerateIRCMessageBin(RplChannelCreated, IRCUsername, "##twitterstream 1401629312"))
 			go StreamTwitter(conn, logindata, c, LastTweetIDMap, LastMentionIDMap, IRCUsername)
 			go PingClient(conn)
 		}
 		// PRIVMSG ##twitterstream :Holla
-		if strings.HasPrefix(line, "PRIVMSG ##twitterstream :") && ConnectionStage == 2 {
+		if strings.HasPrefix(line, "PRIVMSG ##twitterstream :") && HasAuthed {
 			_, err := c.Post(
 				"https://api.twitter.com/1.1/statuses/update.json",
 				map[string]string{
@@ -204,7 +206,7 @@ func handleIRCConn(conn net.Conn) {
 			if err != nil {
 				conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", "##twitterstream", "SYS"))
 			}
-		} else if strings.HasPrefix(line, "PRIVMSG ") && ConnectionStage == 2 {
+		} else if strings.HasPrefix(line, "PRIVMSG ") && HasAuthed {
 			HandlePRIVreply(conn, logindata, c, line, LastTweetIDMap, LastMentionIDMap)
 		}
 
