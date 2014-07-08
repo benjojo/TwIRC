@@ -187,13 +187,13 @@ func handleIRCConn(conn net.Conn) {
 				conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :@%s %s", IRCUsername, v)))
 			}
 			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
+			go StreamTwitter(conn, logindata, c, LastTweetIDMap, LastMentionIDMap, IRCUsername)
+			go PingClient(conn)
 		}
 
 		if strings.HasPrefix(line, "MODE ##twitterstream") && HasAuthed {
 			conn.Write(GenerateIRCMessageBin(RplChannelModeIs, IRCUsername, "##twitterstream +ns"))
 			conn.Write(GenerateIRCMessageBin(RplChannelCreated, IRCUsername, "##twitterstream 1401629312"))
-			go StreamTwitter(conn, logindata, c, LastTweetIDMap, LastMentionIDMap, IRCUsername)
-			go PingClient(conn)
 		}
 		// PRIVMSG ##twitterstream :Holla
 		if strings.HasPrefix(line, "PRIVMSG ##twitterstream :") && HasAuthed {
