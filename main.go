@@ -69,6 +69,7 @@ func handleIRCConn(conn net.Conn) {
 	LastTweetIDMap = make(map[string]Tweet)
 	LastMentionIDMap = make(map[string]Tweet)
 	var HasAuthed bool = false
+	var IsInChan bool = false
 
 	hostname, e := os.Hostname()
 	if e != nil {
@@ -109,7 +110,7 @@ func handleIRCConn(conn net.Conn) {
 			ConnectionStage++
 		}
 
-		if strings.HasPrefix(line, "KICK ##twitterstream ") && ConnectionStage == 2 {
+		if strings.HasPrefix(line, "KICK ##twitterstream ") && HasAuthed && IsInChan {
 			Target := strings.Split(line, " ")[2]
 			r, e := c.Post("https://api.twitter.com/1.1/friendships/destroy.json",
 				map[string]string{
@@ -170,12 +171,12 @@ func handleIRCConn(conn net.Conn) {
 			}
 		}
 
-		if strings.HasPrefix(strings.ToUpper(line), "MENTION") && HasAuthed {
+		if strings.HasPrefix(strings.ToUpper(line), "MENTION") && HasAuthed && IsInChan {
 			ReplyLatestTweet = false
 			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest mention of you", IRCUsername, "SYS"))
 		}
 
-		if strings.HasPrefix(strings.ToUpper(line), "ALL") && HasAuthed {
+		if strings.HasPrefix(strings.ToUpper(line), "ALL") && HasAuthed && IsInChan {
 			ReplyLatestTweet = true
 			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest tweet of the target", IRCUsername, "SYS"))
 		}
@@ -189,6 +190,7 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
 			go StreamTwitter(conn, logindata, c, LastTweetIDMap, LastMentionIDMap, IRCUsername)
 			go PingClient(conn)
+			IsInChan = true
 		}
 
 		if strings.HasPrefix(line, "MODE ##twitterstream") && HasAuthed {
@@ -196,7 +198,7 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCMessageBin(RplChannelCreated, IRCUsername, "##twitterstream 1401629312"))
 		}
 		// PRIVMSG ##twitterstream :Holla
-		if strings.HasPrefix(line, "PRIVMSG ##twitterstream :") && HasAuthed {
+		if strings.HasPrefix(line, "PRIVMSG ##twitterstream :") && HasAuthed && IsInChan {
 			_, err := c.Post(
 				"https://api.twitter.com/1.1/statuses/update.json",
 				map[string]string{
