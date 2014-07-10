@@ -183,9 +183,9 @@ func handleIRCConn(conn net.Conn) {
 
 		if strings.HasPrefix(strings.ToUpper(line), "UNDO") && HasAuthed && IsInChan {
 			_, err := c.Post(
-				fmt.Sprintf("https://api.twitter.com/1.1/statuses/destroy/%s.json", LastTweetIDMap[IRCUsername].IdStr),
+				fmt.Sprintf("https://api.twitter.com/1.1/statuses/destroy/%s.json", LastTweetIDMap[strings.ToLower(IRCUsername)].IdStr),
 				map[string]string{
-					"id": LastTweetIDMap[IRCUsername].IdStr,
+					"id": LastTweetIDMap[strings.ToLower(IRCUsername)].IdStr,
 				},
 				&logindata)
 			if err != nil {
