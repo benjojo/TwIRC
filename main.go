@@ -181,6 +181,20 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest tweet of the target", IRCUsername, "SYS"))
 		}
 
+		if strings.HasPrefix(strings.ToUpper(line), "UNDO") && HasAuthed && IsInChan {
+			_, err := c.Post(
+				fmt.Sprintf("https://api.twitter.com/1.1/statuses/destroy/%s.json", LastTweetIDMap[IRCUsername].IdStr),
+				map[string]string{
+					"id": LastTweetIDMap[IRCUsername].IdStr,
+				},
+				&logindata)
+			if err != nil {
+				conn.Write(GenerateIRCPrivateMessage("Failed to undo tweet. ur boned now.", "##twitterstream", "SYS"))
+			} else {
+				conn.Write(GenerateIRCPrivateMessage("Tweet undone", IRCUsername, "SYS"))
+			}
+		}
+
 		if strings.HasPrefix(line, "JOIN ##twitterstream") && HasAuthed {
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
 			NList := ProduceNameList(logindata, c)
