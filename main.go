@@ -247,7 +247,7 @@ func HandlePRIVreply(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consum
 				"https://api.twitter.com/1.1/statuses/update.json",
 				map[string]string{
 					"status":                fmt.Sprintf("@%s %s", bits[1], tweetstring[2:]),
-					"in_reply_to_status_id": fmt.Sprint(lastmention),
+					"in_reply_to_status_id": fmt.Sprint(lastmention.IdStr),
 				},
 				&logindata)
 			fmt.Printf("I'm going to post '%s' with a msg ID chain %s %s \n", "@"+bits[1]+" "+tweetstring, lastmention, fmt.Sprint(lastmention))
