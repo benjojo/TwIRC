@@ -316,8 +316,16 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 			// Maybe its a delete packet???
 			DP := RemovePacket{}
 			e = json.Unmarshal(line, &DP)
+
 			if DP.Delete.Status.IdStr != "" {
-				conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("User %s (%s) remove tweet %s", DP.Delete.Status.UserIdStr, ScanForName(DP.Delete.Status.UserIdStr, LastTweetIDMap), DP.Delete.Status.IdStr), "##twitterstream", "SYS"))
+				OffendersName := ScanForName(DP.Delete.Status.UserIdStr, LastTweetIDMap)
+				ExtraInfo := ""
+				if LastTweetIDMap[OffendersName].IdStr != "" {
+					if LastTweetIDMap[OffendersName].IdStr == DP.Delete.Status.IdStr {
+						ExtraInfo = "(It was the latest tweet they posted)"
+					}
+				}
+				conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("User %s (%s) remove tweet %s %s", DP.Delete.Status.UserIdStr, OffendersName, DP.Delete.Status.IdStr, ExtraInfo), "##twitterstream", "SYS"))
 			} else {
 				conn.Write(GenerateIRCPrivateMessage("unknown message: "+string(line), "##twitterstream", "SYS"))
 			}
