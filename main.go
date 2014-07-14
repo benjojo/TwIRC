@@ -205,18 +205,6 @@ func handleIRCConn(conn net.Conn) {
 			}
 		}
 
-		if strings.HasPrefix(line, "JOIN ##twitterstream") && HasAuthed {
-			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
-			NList := ProduceNameList(logindata, c)
-			for _, v := range NList {
-				conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :@%s %s", IRCUsername, v)))
-			}
-			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
-			go StreamTwitter(conn, logindata, c, LastTweetIDMap, LastMentionIDMap, IRCUsername)
-			go PingClient(conn)
-			IsInChan = true
-		}
-
 		if strings.HasPrefix(line, "MODE ##twitterstream") && HasAuthed {
 			conn.Write(GenerateIRCMessageBin(RplChannelModeIs, IRCUsername, "##twitterstream +ns"))
 			conn.Write(GenerateIRCMessageBin(RplChannelCreated, IRCUsername, "##twitterstream 1401629312"))
