@@ -105,7 +105,11 @@ func handleIRCConn(conn net.Conn) {
 
 		if strings.HasPrefix(line, "PASS ") && ConnectionStage == 0 {
 			TwitterToken = strings.Split(line, " ")[1]
-			json.Unmarshal([]byte(TwitterToken), &logindata)
+			err := json.Unmarshal([]byte(TwitterToken), &logindata)
+			if err != nil {
+				conn.Write(GenerateIRCPrivateMessage("Invalid JSON Try again", IRCUsername, "SYS"))
+				return
+			}
 			fmt.Printf("Twitter token: %s \n", TwitterToken)
 			ConnectionStage++
 		}
