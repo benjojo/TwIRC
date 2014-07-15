@@ -135,6 +135,16 @@ func handleIRCConn(conn net.Conn) {
 			IRCUsername = strings.Split(line, " ")[1]
 			conn.Write(GetWelcomePackets(IRCUsername, hostname))
 			HasAuthed = true
+			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
+			NList := ProduceNameList(logindata, c)
+			for _, v := range NList {
+				conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :@%s %s", IRCUsername, v)))
+			}
+			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
+			go StreamTwitter(conn, logindata, c, LastTweetIDMap, LastMentionIDMap, IRCUsername)
+			go PingClient(conn)
+			IsInChan = true
+
 		} else if strings.HasPrefix(line, "NICK ") && ConnectionStage == 0 {
 			IRCUsername = strings.Split(line, " ")[1]
 			conn.Write(GetWelcomePackets(IRCUsername, hostname))
@@ -197,18 +207,6 @@ func handleIRCConn(conn net.Conn) {
 			} else {
 				conn.Write(GenerateIRCPrivateMessage("Tweet undone", IRCUsername, "SYS"))
 			}
-		}
-
-		if strings.HasPrefix(line, "JOIN ##twitterstream") && HasAuthed {
-			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
-			NList := ProduceNameList(logindata, c)
-			for _, v := range NList {
-				conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :@%s %s", IRCUsername, v)))
-			}
-			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
-			go StreamTwitter(conn, logindata, c, LastTweetIDMap, LastMentionIDMap, IRCUsername)
-			go PingClient(conn)
-			IsInChan = true
 		}
 
 		if strings.HasPrefix(line, "MODE ##twitterstream") && HasAuthed {
@@ -320,8 +318,16 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 			// Maybe its a delete packet???
 			DP := RemovePacket{}
 			e = json.Unmarshal(line, &DP)
+
 			if DP.Delete.Status.IdStr != "" {
-				conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("User %s (%s) remove tweet %s", DP.Delete.Status.UserIdStr, ScanForName(DP.Delete.Status.UserIdStr, LastTweetIDMap), DP.Delete.Status.IdStr), "##twitterstream", "SYS"))
+				OffendersName := ScanForName(DP.Delete.Status.UserIdStr, LastTweetIDMap)
+				ExtraInfo := ""
+				if LastTweetIDMap[OffendersName].IdStr != "" {
+					if LastTweetIDMap[OffendersName].IdStr == DP.Delete.Status.IdStr {
+						ExtraInfo = "(It was the latest tweet they posted)"
+					}
+				}
+				conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("User %s (%s) remove tweet %s %s", DP.Delete.Status.UserIdStr, OffendersName, DP.Delete.Status.IdStr, ExtraInfo), "##twitterstream", "SYS"))
 			} else {
 				conn.Write(GenerateIRCPrivateMessage("unknown message: "+string(line), "##twitterstream", "SYS"))
 			}
