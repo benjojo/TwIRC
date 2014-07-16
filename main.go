@@ -153,7 +153,8 @@ func handleIRCConn(conn net.Conn) {
 			var err error
 			RQT, url, err = c.GetRequestTokenAndUrl("oob")
 			if err != nil {
-				log.Fatal(err)
+				conn.Write(GenerateIRCPrivateMessage("Failed to get code, Hangning up", IRCUsername, "SYS"))
+				return
 			}
 
 			conn.Write(GenerateIRCPrivateMessage(fmt.Sprintf("(1) Go to: %s", url), IRCUsername, "SYS"))
