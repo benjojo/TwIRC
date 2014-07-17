@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 )
 
 func GenerateIRCMessage(code string, username string, data string) string {
@@ -12,7 +13,13 @@ func GenerateIRCMessageBin(code string, username string, data string) []byte {
 	return []byte(GenerateIRCMessage(code, username, data))
 }
 
-func GetWelcomePackets(IRCUsername string, hostname string) []byte {
+func GetWelcomePackets(IRCUsername string) []byte {
+
+	hostname, e := os.Hostname()
+	if e != nil {
+		hostname = "Unknown"
+	}
+
 	pack := ""
 	pack += GenerateIRCMessage(RplWelcome, IRCUsername, ":Welcome to TwiRC")
 	pack += GenerateIRCMessage(RplYourHost, IRCUsername, fmt.Sprintf(":Host is: %s", hostname))

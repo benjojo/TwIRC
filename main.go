@@ -71,11 +71,6 @@ func handleIRCConn(conn net.Conn) {
 	var HasAuthed bool = false
 	var IsInChan bool = false
 
-	hostname, e := os.Hostname()
-	if e != nil {
-		hostname = "Unknown"
-	}
-
 	c := oauth.NewConsumer(
 		configarray[0],
 		configarray[1],
@@ -133,7 +128,7 @@ func handleIRCConn(conn net.Conn) {
 		if strings.HasPrefix(line, "NICK ") && ConnectionStage == 1 {
 			fmt.Println(line)
 			IRCUsername = strings.Split(line, " ")[1]
-			conn.Write(GetWelcomePackets(IRCUsername, hostname))
+			conn.Write(GetWelcomePackets(IRCUsername))
 			HasAuthed = true
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
 			NList := ProduceNameList(logindata, c)
@@ -147,7 +142,7 @@ func handleIRCConn(conn net.Conn) {
 
 		} else if strings.HasPrefix(line, "NICK ") && ConnectionStage == 0 {
 			IRCUsername = strings.Split(line, " ")[1]
-			conn.Write(GetWelcomePackets(IRCUsername, hostname))
+			conn.Write(GetWelcomePackets(IRCUsername))
 
 			var url string
 			var err error
