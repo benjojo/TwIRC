@@ -183,12 +183,12 @@ func handleIRCConn(conn net.Conn) {
 
 		if strings.HasPrefix(strings.ToUpper(line), "MENTION") && HasAuthed && IsInChan {
 			ReplyLatestTweet = false
-			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest mention of you", IRCUsername, "SYS"))
+			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest mention of you", "##twitterstream", "SYS"))
 		}
 
 		if strings.HasPrefix(strings.ToUpper(line), "ALL") && HasAuthed && IsInChan {
 			ReplyLatestTweet = true
-			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest tweet of the target", IRCUsername, "SYS"))
+			conn.Write(GenerateIRCPrivateMessage("PM's will now RE the latest tweet of the target", "##twitterstream", "SYS"))
 		}
 
 		if strings.HasPrefix(strings.ToUpper(line), "UNDO") && HasAuthed && IsInChan {
