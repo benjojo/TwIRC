@@ -199,7 +199,7 @@ func handleIRCConn(conn net.Conn) {
 				},
 				&logindata)
 			if err != nil {
-				conn.Write(GenerateIRCPrivateMessage("Failed to undo tweet. ur boned now.", "##twitterstream", "SYS"))
+				conn.Write(GenerateIRCPrivateMessage("Failed to undo tweet.", "##twitterstream", "SYS"))
 			} else {
 				conn.Write(GenerateIRCPrivateMessage("Tweet undone", IRCUsername, "SYS"))
 			}
@@ -294,7 +294,7 @@ func StreamTwitter(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer
 		line, _, e := twitterinbound.ReadLine()
 
 		if e != nil {
-			conn.Write(GenerateIRCPrivateMessage("System has broken, Shutting down.", "##twitterstream", "SYS"))
+			conn.Write(GenerateIRCPrivateMessage("System has lost connection to stream, Shutting down.", "##twitterstream", "SYS"))
 			conn.Close()
 			return
 		}
