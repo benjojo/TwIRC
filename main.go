@@ -105,7 +105,6 @@ func handleIRCConn(conn net.Conn) {
 				conn.Write(GenerateIRCPrivateMessage("Invalid JSON Try again", IRCUsername, "SYS"))
 				return
 			}
-			fmt.Printf("Twitter token: %s \n", TwitterToken)
 			ConnectionStage++
 		}
 
@@ -126,7 +125,6 @@ func handleIRCConn(conn net.Conn) {
 		}
 
 		if strings.HasPrefix(line, "NICK ") && ConnectionStage == 1 {
-			fmt.Println(line)
 			IRCUsername = strings.Split(line, " ")[1]
 			conn.Write(GetWelcomePackets(IRCUsername))
 			HasAuthed = true
