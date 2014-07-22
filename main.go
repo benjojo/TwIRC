@@ -93,7 +93,7 @@ func handleIRCConn(conn net.Conn) {
 
 		fmt.Println(line)
 
-		if strings.HasPrefix(line, "QUIT ") {
+		if strings.HasPrefix(line, "QUIT") {
 			conn.Close()
 			return
 		}
