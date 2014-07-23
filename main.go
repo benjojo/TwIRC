@@ -129,7 +129,7 @@ func handleIRCConn(conn net.Conn) {
 			conn.Write(GetWelcomePackets(IRCUsername))
 			HasAuthed = true
 			conn.Write([]byte(fmt.Sprintf(":%s!~%s@twitter.com JOIN ##twitterstream * :Ben Cox\r\n", IRCUsername, IRCUsername)))
-			NList := ProduceNameList(logindata, c)
+			NList := ProduceNameList(logindata, c, LastTweetIDMap)
 			for _, v := range NList {
 				conn.Write(GenerateIRCMessageBin(RplNamReply, IRCUsername, fmt.Sprintf("@ ##twitterstream :@%s %s", IRCUsername, v)))
 			}

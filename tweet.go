@@ -6,6 +6,7 @@ import (
 	"github.com/mrjones/oauth"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type Tweet struct {
@@ -135,25 +136,26 @@ func GetFollowers(cursor string, logindata oauth.AccessToken, c *oauth.Consumer)
 	return Flist
 }
 
-func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer) []string {
+func ProduceNameList(logindata oauth.AccessToken, c *oauth.Consumer, TM map[string]Tweet) []string {
 	Chunks := make([]string, 0)
 	Flist := GetFollowers("0", logindata, c)
-	Chunks = MakeUserList(Flist, Chunks)
+	Chunks = MakeUserList(Flist, Chunks, TM)
 
 	for Flist.NextCursorStr != "0" {
-
 		Flist = GetFollowers(Flist.NextCursorStr, logindata, c)
-		Chunks = MakeUserList(Flist, Chunks)
+		Chunks = MakeUserList(Flist, Chunks, TM)
 	}
 
 	return Chunks
 }
 
-func MakeUserList(Flist FollowList, input []string) []string {
+func MakeUserList(Flist FollowList, input []string, TM map[string]Tweet) []string {
 	RunningList := ""
 	for c, v := range Flist.Users {
 		RunningList = RunningList + " " + v.ScreenName
-
+		T := Tweet{}
+		T.User = v
+		TM[strings.ToLower(v.ScreenName)] = T
 		if c%50 == 0 {
 			input = append(input, RunningList)
 			RunningList = ""
