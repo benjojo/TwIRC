@@ -83,6 +83,8 @@ func handleIRCConn(conn net.Conn) {
 	logindata := oauth.AccessToken{}
 	var RQT *oauth.RequestToken
 	reader := bufio.NewReader(conn)
+	go PingClient(conn)
+
 	for {
 		lineb, _, err := reader.ReadLine()
 		line := string(lineb)
@@ -135,7 +137,6 @@ func handleIRCConn(conn net.Conn) {
 			}
 			conn.Write(GenerateIRCMessageBin(RplEndOfNames, IRCUsername, "##twitterstream :End of /NAMES list."))
 			go StreamTwitter(conn, logindata, c, LastTweetIDMap, LastMentionIDMap, IRCUsername)
-			go PingClient(conn)
 			IsInChan = true
 
 		} else if strings.HasPrefix(line, "NICK ") && ConnectionStage == 0 {
