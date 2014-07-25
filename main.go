@@ -200,7 +200,7 @@ func handleIRCConn(conn net.Conn) {
 			if err != nil {
 				conn.Write(GenerateIRCPrivateMessage("Failed to undo tweet.", "##twitterstream", "SYS"))
 			} else {
-				conn.Write(GenerateIRCPrivateMessage("Tweet undone", IRCUsername, "SYS"))
+				conn.Write(GenerateIRCPrivateMessage("Tweet undone", "##twitterstream", "SYS"))
 			}
 		}
 
