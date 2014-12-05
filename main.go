@@ -217,17 +217,17 @@ func handleIRCConn(conn net.Conn) {
 				},
 				&logindata)
 			if err != nil {
-				conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", "##twitterstream", "SYS"))
+				conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", IRCUsername, "SYS"))
 			}
 		} else if strings.HasPrefix(line, "PRIVMSG ") && HasAuthed {
-			HandlePRIVreply(conn, logindata, c, line, LastTweetIDMap, LastMentionIDMap)
+			HandlePRIVreply(conn, logindata, c, line, LastTweetIDMap, LastMentionIDMap, IRCUsername)
 		}
 
 	}
 
 }
 
-func HandlePRIVreply(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer, line string, LastTweetIDMap map[string]Tweet, LastMentionIDMap map[string]Tweet) {
+func HandlePRIVreply(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consumer, line string, LastTweetIDMap map[string]Tweet, LastMentionIDMap map[string]Tweet, IRCUsername string) {
 	bits := strings.Split(line, " ")
 	if len(bits) > 2 {
 		tweetstring := strings.Replace(line, "PRIVMSG "+bits[1], "", 1)
@@ -258,7 +258,7 @@ func HandlePRIVreply(conn net.Conn, logindata oauth.AccessToken, c *oauth.Consum
 			fmt.Printf("I'm going to post '%s' \n", "@"+bits[1]+" "+tweetstring)
 		}
 		if err != nil {
-			conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", "##twitterstream", "SYS"))
+			conn.Write(GenerateIRCPrivateMessage("Failed to post tweet.", IRCUsername, "SYS"))
 		}
 	}
 }
