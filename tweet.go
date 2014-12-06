@@ -10,10 +10,8 @@ import (
 )
 
 type Tweet struct {
-	Contributors interface{} `json:"contributors"`
-	Coordinates  interface{} `json:"coordinates"`
-	CreatedAt    string      `json:"created_at"`
-	Entities     struct {
+	CreatedAt string `json:"created_at"`
+	Entities  struct {
 		Hashtags     []interface{} `json:"hashtags"`
 		Symbols      []interface{} `json:"symbols"`
 		Urls         []interface{} `json:"urls"`
@@ -22,7 +20,6 @@ type Tweet struct {
 	FavoriteCount        float64     `json:"favorite_count"`
 	Favorited            bool        `json:"favorited"`
 	FilterLevel          string      `json:"filter_level"`
-	Geo                  interface{} `json:"geo"`
 	ID                   float64     `json:"id"`
 	IdStr                string      `json:"id_str"`
 	InReplyToScreenName  string      `json:"in_reply_to_screen_name"`
@@ -31,7 +28,6 @@ type Tweet struct {
 	InReplyToUserID      float64     `json:"in_reply_to_user_id"`
 	InReplyToUserIdStr   string      `json:"in_reply_to_user_id_str"`
 	Lang                 string      `json:"lang"`
-	Place                interface{} `json:"place"`
 	RetweetCount         float64     `json:"retweet_count"`
 	Retweeted            bool        `json:"retweeted"`
 	Source               string      `json:"source"`
